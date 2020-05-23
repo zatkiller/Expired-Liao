@@ -6,7 +6,13 @@ const FoodItem = props => {
         <TouchableOpacity activeOpacity={0.8} onPress={props.onDelete.bind(this, props.id)}>
             <View style={styles.listItem} >
                 <Text>
-                    {props.title}
+                    Item: {props.title}
+                </Text>
+                <Text>
+                    Expiry Date: {props.expiry}
+                </Text>
+                <Text>
+                    Quantity: {props.quantity}
                 </Text>
             </View>
         </TouchableOpacity>

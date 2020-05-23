@@ -8,10 +8,10 @@ export default function App() {
   const [food, setFood] = useState([]);
   const [isAddMode, setIsAddMode] = useState(false);
 
-  const addFoodHandler = FoodTitle => {
+  const addFoodHandler = (foodName, date, qty) => {
     setFood(currentFood => [
       ...currentFood,
-      { id: Math.random().toString(), value: FoodTitle }]);
+      { id: Math.random().toString(), name: foodName, expiry: date, quantity: qty }]);
     setIsAddMode(false);
   };
 
@@ -38,7 +38,9 @@ export default function App() {
           <FoodItem
             id={itemData.item.id}
             onDelete={removeFoodHandler}
-            title={itemData.item.value} />
+            title={itemData.item.name}
+            expiry={itemData.item.expiry}
+            quantity={itemData.item.quantity} />
         )}
       />
     </View>
