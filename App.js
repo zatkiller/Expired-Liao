@@ -3,7 +3,7 @@ import { StyleSheet, View, Button, FlatList } from 'react-native';
 
 import FoodItem from './components/FoodItem'
 import FoodInput from './components/FoodInput'
-
+//Testing git command
 export default function App() {
   const [food, setFood] = useState([]);
   const [isAddMode, setIsAddMode] = useState(false);
