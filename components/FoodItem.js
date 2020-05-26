@@ -11,6 +11,7 @@ const FoodItem = props => {
                 <Text>
                     Expiry Date: {props.expiry}
                 </Text>
+
                 <Text>
                     Quantity: {props.quantity}
                 </Text>
