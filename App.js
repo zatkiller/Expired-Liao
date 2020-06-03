@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Button, FlatList } from 'react-native';
+import { Text, StyleSheet, View, Button, FlatList, ScrollView } from 'react-native';
 
 import FoodItem from './components/FoodItem'
 import FoodInput from './components/FoodInput'
+import { render } from 'react-dom';
 //Testing git command
 export default function App() {
   const [food, setFood] = useState([]);
@@ -27,22 +28,26 @@ export default function App() {
 
   return (
     <View style={styles.screen}>
-      <Button title="Add new Food" onPress={() => setIsAddMode(true)} />
-      <FoodInput visible={isAddMode}
-        onAddFood={addFoodHandler}
-        onCancel={cancelFoodAdditionHandler} />
-      <FlatList
-        keyExtractor={(item, index) => item.id}
-        data={food}
-        renderItem={itemData => (
-          <FoodItem
-            id={itemData.item.id}
-            onDelete={removeFoodHandler}
-            title={itemData.item.name}
-            expiry={itemData.item.expiry}
-            quantity={itemData.item.quantity} />
-        )}
-      />
+      <View>
+        <Button title="Add To Inventory" onPress={() => setIsAddMode(true)} />
+        <FoodInput visible={isAddMode}
+          onAddFood={addFoodHandler}
+          onCancel={cancelFoodAdditionHandler} />
+      </View>
+      <ScrollView >
+        <FlatList
+          keyExtractor={(item, index) => item.id}
+          data={food}
+          renderItem={itemData => (
+            <FoodItem
+              id={itemData.item.id}
+              onDelete={removeFoodHandler}
+              title={itemData.item.name}
+              expiry={itemData.item.expiry}
+              quantity={itemData.item.quantity} /> 
+          )}
+        />
+        </ScrollView>
     </View>
   );
 }
