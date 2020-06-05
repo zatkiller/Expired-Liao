@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, Button, FlatList, ScrollView } from 'react-nati
 
 import FoodItem from './components/FoodItem'
 import FoodInput from './components/FoodInput'
+import ImagePicker from './components/ImagePicker'
 import { render } from 'react-dom';
 //Testing git command
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
           onCancel={cancelFoodAdditionHandler} />
       </View>
       <ScrollView >
+        <ImagePicker />
         <FlatList
           keyExtractor={(item, index) => item.id}
           data={food}
@@ -44,8 +46,9 @@ export default function App() {
               onDelete={removeFoodHandler}
               title={itemData.item.name}
               expiry={itemData.item.expiry}
-              quantity={itemData.item.quantity} /> 
+              quantity={itemData.item.quantity} />       
           )}
+
         />
         </ScrollView>
     </View>
