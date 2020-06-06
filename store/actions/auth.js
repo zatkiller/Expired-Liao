@@ -5,11 +5,8 @@ export const LOGIN = "LOGIN";
 export const AUTHENTICATE = "AUTHENTICATE";
 export const LOGOUT = "LOGOUT";
 
-// let timer;
-
 export const authenticate = (userId, token) => {
 	return (dispatch) => {
-		// dispatch(setLogoutTimer(expiryTime));
 		dispatch({ type: AUTHENTICATE, userId: userId, token: token });
 	};
 };
@@ -43,19 +40,8 @@ export const signup = (email, password) => {
 
 		const resData = await response.json();
 		console.log(resData);
-		dispatch(
-			authenticate(
-				resData.localId,
-				resData.idToken
-				//parseInt(resData.expiresIn) * 1000
-			)
-		);
-		// const expirationDate = new Date(
-		// 	new Date().getTime() + parseInt(resData.expiresIn) * 1000
-		// );
+		dispatch(authenticate(resData.localId, resData.idToken));
 		saveDataToStorage(resData.idToken, resData.localId);
-
-		//expirationDate
 	};
 };
 
@@ -90,53 +76,23 @@ export const login = (email, password) => {
 
 		const resData = await response.json();
 		console.log(resData);
-		dispatch(
-			authenticate(
-				resData.localId,
-				resData.idToken
-				//			parseInt(resData.expiresIn) * 1000
-			)
-		);
-		// const expirationDate = new Date(
-		// 	new Date().getTime() + parseInt(resData.expiresIn) * 1000
-		// );
-		saveDataToStorage(
-			resData.idToken,
-			resData.localId //expirationDate
-		);
+		dispatch(authenticate(resData.localId, resData.idToken));
+
+		saveDataToStorage(resData.idToken, resData.localId);
 	};
 };
 
 export const logout = () => {
-	//clearLogoutTimer();
 	AsyncStorage.removeItem("userData");
 	return { type: LOGOUT };
 };
 
-// const clearLogoutTimer = () => {
-// 	if (timer) {
-// 		clearTimeout(timer);
-// 	}
-// };
-
-// const setLogoutTimer = (expirationTime) => {
-// 	return (dispatch) => {
-// 		timer = setTimeout(() => {
-// 			dispatch(logout());
-// 		}, expirationTime);
-// 	};
-// };
-
-const saveDataToStorage = (
-	token,
-	userId //, expirationDate
-) => {
+const saveDataToStorage = (token, userId) => {
 	AsyncStorage.setItem(
 		"userData",
 		JSON.stringify({
 			token: token,
 			userId: userId,
-			//expiryDate: expirationDate.toISOString(),
 		})
 	);
 };

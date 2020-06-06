@@ -2,7 +2,7 @@ import React from "react";
 import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
-import { Platform, SafeAreaView, Button, View } from "react-native";
+import { Platform, SafeAreaView, Button, View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 
@@ -36,7 +36,7 @@ const FoodDatabaseNavigator = createStackNavigator(
 		navigationOptions: {
 			drawerIcon: (drawerConfig) => (
 				<Ionicons
-					name={Platform.OS === "android" ? "md-list" : "ios-list"}
+					name={Platform.OS === "android" ? "md-pizza" : "ios-pizza"}
 					size={23}
 					color={drawerConfig.tintColor}
 				/>
@@ -55,7 +55,9 @@ const ReportNavigator = createStackNavigator(
 			drawerIcon: (drawerConfig) => (
 				<Ionicons
 					name={
-						Platform.OS === "android" ? "md-create" : "ios-create"
+						Platform.OS === "android"
+							? "md-document"
+							: "ios-document"
 					}
 					size={23}
 					color={drawerConfig.tintColor}
@@ -83,14 +85,17 @@ const AppNavigator = createDrawerNavigator(
 						forceInset={{ top: "always", horizontal: "never" }}
 					>
 						<DrawerItems {...props} />
-						<Button
-							title="Logout"
-							color={Colors.primary}
-							onPress={() => {
-								dispatch(authActions.logout());
-								// props.navigation.navigate('Auth');
-							}}
-						/>
+						<View style={styles.button}>
+							<Button
+								style={styles.button}
+								title="Logout"
+								color="#2a9d8f"
+								onPress={() => {
+									dispatch(authActions.logout());
+									// props.navigation.navigate('Auth');
+								}}
+							/>
+						</View>
 					</SafeAreaView>
 				</View>
 			);
@@ -111,6 +116,12 @@ const MainNavigator = createSwitchNavigator({
 	Startup: StartupScreen,
 	Auth: AuthNavigator,
 	App: AppNavigator,
+});
+
+const styles = StyleSheet.create({
+	button: {
+		margin: 20,
+	},
 });
 
 export default createAppContainer(MainNavigator);

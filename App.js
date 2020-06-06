@@ -5,7 +5,7 @@ import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import ReduxThunk from "redux-thunk";
 
-import foodReducer from "./store/reducers/Food";
+import foodReducer from "./store/reducers/food";
 import authReducer from "./store/reducers/auth";
 import NavigationContainer from "./navigation/NavigationContainer";
 

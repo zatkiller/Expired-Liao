@@ -1,80 +1,88 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-	Text,
-	StyleSheet,
 	View,
-	Button,
+	Text,
 	FlatList,
-	ScrollView,
+	Button,
+	Platform,
+	Alert,
+	StyleSheet,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
-import * as authActions from "../../store/actions/auth.js";
 import HeaderButton from "../../components/UI/HeaderButton";
 import FoodItem from "../../components/app/FoodItem";
-import FoodInput from "../../components/app/FoodInput";
+import Colors from "../../constants/Colors";
+import * as foodActions from "../../store/actions/food";
 
 const FoodDatabaseScreen = (props) => {
+	const userFood = useSelector((state) => state.food.userFood);
 	const dispatch = useDispatch();
-	// const [food, setFood] = useState([]);
-	// const [isAddMode, setIsAddMode] = useState(false);
 
-	// const addFoodHandler = (foodName, date, qty) => {
-	// 	setFood((currentFood) => [
-	// 		...currentFood,
-	// 		{
-	// 			id: Math.random().toString(),
-	// 			name: foodName,
-	// 			expiry: date,
-	// 			quantity: qty,
-	// 		},
-	// 	]);
-	// 	setIsAddMode(false);
-	// };
+	const editFoodHandler = (id) => {
+		props.navigation.navigate("EditFood", { foodId: id });
+	};
 
-	// const removeFoodHandler = (FoodID) => {
-	// 	setFood((currentFood) => {
-	// 		return currentFood.filter((Food) => Food.id !== FoodID);
-	// 	});
-	// };
+	const deleteHandler = (id) => {
+		Alert.alert(
+			"Are you sure?",
+			"Do you really want to delete this item?",
+			[
+				{ text: "No", style: "default" },
+				{
+					text: "Yes",
+					style: "destructive",
+					onPress: () => {
+						dispatch(foodActions.deleteFood(id));
+					},
+				},
+			]
+		);
+	};
 
-	// const cancelFoodAdditionHandler = () => {
-	// 	setIsAddMode(false);
-	// };
+	if (userFood.length === 0) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Text>No food found, maybe start creating some?</Text>
+			</View>
+		);
+	}
 
 	return (
-		<View>
-			<Text>Food Database Screen</Text>
-		</View>
-		// <View style={styles.screen}>
-		// 	<View>
-		// 		<Button
-		// 			title="Add To Inventory"
-		// 			onPress={() => setIsAddMode(true)}
-		// 		/>
-		// 		<FoodInput
-		// 			visible={isAddMode}
-		// 			onAddFood={addFoodHandler}
-		// 			onCancel={cancelFoodAdditionHandler}
-		// 		/>
-		// 	</View>
-		// 	<ScrollView>
-		// 		<FlatList
-		// 			keyExtractor={(item, index) => item.id}
-		// 			data={food}
-		// 			renderItem={(itemData) => (
-		// 				<FoodItem
-		// 					id={itemData.item.id}
-		// 					onDelete={removeFoodHandler}
-		// 					title={itemData.item.name}
-		// 					expiry={itemData.item.expiry}
-		// 					quantity={itemData.item.quantity}
-		// 				/>
-		// 			)}
-		// 		/>
-		// 	</ScrollView>
-		// </View>
+		<FlatList
+			data={userFood}
+			keyExtractor={(item) => item.id}
+			renderItem={(itemData) => (
+				<FoodItem
+					image={itemData.item.imageUrl}
+					title={itemData.item.title}
+					price={itemData.item.price}
+					onSelect={() => {
+						editFoodHandler(itemData.item.id);
+					}}
+				>
+					<Button
+						color={Colors.primary}
+						title="Edit"
+						onPress={() => {
+							editFoodHandler(itemData.item.id);
+						}}
+					/>
+					<Button
+						color={Colors.primary}
+						title="Delete"
+						onPress={deleteHandler.bind(this, itemData.item.id)}
+					/>
+				</FoodItem>
+			)}
+		/>
 	);
 };
 
@@ -102,7 +110,7 @@ FoodDatabaseScreen.navigationOptions = (navData) => {
 					<Item
 						title="Add Food"
 						iconName={
-							Platform.OS === "android" ? "md-cart" : "ios-cart"
+							Platform.OS === "android" ? "md-add" : "ios-add"
 						}
 						onPress={() => {
 							navData.navigation.navigate("AddFood");
