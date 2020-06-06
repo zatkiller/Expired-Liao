@@ -96,6 +96,21 @@ FoodDatabaseScreen.navigationOptions = (navData) => {
 				</HeaderButtons>
 			);
 		},
+		headerRight: () => {
+			return (
+				<HeaderButtons HeaderButtonComponent={HeaderButton}>
+					<Item
+						title="Add Food"
+						iconName={
+							Platform.OS === "android" ? "md-cart" : "ios-cart"
+						}
+						onPress={() => {
+							navData.navigation.navigate("AddFood");
+						}}
+					/>
+				</HeaderButtons>
+			);
+		},
 	};
 };
 

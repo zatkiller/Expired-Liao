@@ -6,6 +6,7 @@ import { Platform, SafeAreaView, Button, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 
+import AddFoodScreen from "../screens/user/AddFoodScreen";
 import FoodDatabaseScreen from "../screens/user/FoodDatabaseScreen";
 import Report from "../screens/user/ReportScreen";
 import AuthScreen from "../screens/login/AuthenticationScreen";
@@ -29,6 +30,7 @@ const defaultNavOptions = {
 const FoodDatabaseNavigator = createStackNavigator(
 	{
 		Food: FoodDatabaseScreen,
+		AddFood: AddFoodScreen,
 	},
 	{
 		navigationOptions: {
