@@ -1,45 +1,59 @@
-import React, { useState } from "react";
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import { Provider } from "react-redux";
-import { AppLoading } from "expo";
-import * as Font from "expo-font";
-import ReduxThunk from "redux-thunk";
+import React, { useState } from 'react';
+import { Text, StyleSheet, View, Button, FlatList, ScrollView } from 'react-native';
 
-import foodReducer from "./store/reducers/Food";
-import authReducer from "./store/reducers/auth";
-import NavigationContainer from "./navigation/NavigationContainer";
-
-const rootReducer = combineReducers({
-	food: foodReducer,
-	auth: authReducer,
-});
-
-const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
-
-const fetchFonts = () => {
-	return Font.loadAsync({
-		"open-sans": require("./assets/fonts/OpenSans-Regular.ttf"),
-		"open-sans-bold": require("./assets/fonts/OpenSans-Bold.ttf"),
-	});
-};
-
+import FoodItem from './components/FoodItem'
+import FoodInput from './components/FoodInput'
+import { render } from 'react-dom';
+//Testing git command
 export default function App() {
-	const [fontLoaded, setFontLoaded] = useState(false);
+  const [food, setFood] = useState([]);
+  const [isAddMode, setIsAddMode] = useState(false);
 
-	if (!fontLoaded) {
-		return (
-			<AppLoading
-				startAsync={fetchFonts}
-				onFinish={() => {
-					setFontLoaded(true);
-				}}
-			/>
-		);
-	}
+  const addFoodHandler = (foodName, date, qty) => {
+    setFood(currentFood => [
+      ...currentFood,
+      { id: Math.random().toString(), name: foodName, expiry: date, quantity: qty }]);
+    setIsAddMode(false);
+  };
 
-	return (
-		<Provider store={store}>
-			<NavigationContainer />
-		</Provider>
-	);
+  const removeFoodHandler = FoodID => {
+    setFood(currentFood => {
+      return currentFood.filter(Food => Food.id !== FoodID);
+    });
+  }
+
+  const cancelFoodAdditionHandler = () => {
+    setIsAddMode(false);
+  }
+
+  return (
+    <View style={styles.screen}>
+      <View>
+        <Button title="Add To Inventory" onPress={() => setIsAddMode(true)} />
+        <FoodInput visible={isAddMode}
+          onAddFood={addFoodHandler}
+          onCancel={cancelFoodAdditionHandler} />
+      </View>
+      <ScrollView >
+        <FlatList
+          keyExtractor={(item, index) => item.id}
+          data={food}
+          renderItem={itemData => (
+            <FoodItem
+              id={itemData.item.id}
+              onDelete={removeFoodHandler}
+              title={itemData.item.name}
+              expiry={itemData.item.expiry}
+              quantity={itemData.item.quantity} /> 
+          )}
+        />
+        </ScrollView>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    padding: 50,
+  },
+});
