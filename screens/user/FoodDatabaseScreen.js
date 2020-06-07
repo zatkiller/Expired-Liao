@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
 	View,
 	Text,
@@ -7,6 +7,7 @@ import {
 	Platform,
 	Alert,
 	StyleSheet,
+	ActivityIndicator,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
@@ -17,11 +18,39 @@ import Colors from "../../constants/Colors";
 import * as foodActions from "../../store/actions/food";
 
 const FoodDatabaseScreen = (props) => {
+	const [isLoading, setIsLoading] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [error, setError] = useState();
 	const userFood = useSelector((state) => state.food.userFood);
 	const dispatch = useDispatch();
 
+	const loadProducts = useCallback(async () => {
+		setError(null);
+		setIsRefreshing(true);
+		try {
+			await dispatch(foodActions.fetchFood());
+		} catch (err) {
+			setError(err.message);
+		}
+		setIsRefreshing(false);
+	}, [dispatch, setIsLoading, setError]);
+
 	const editFoodHandler = (id) => {
-		props.navigation.navigate("EditFood", { foodId: id });
+		props.navigation.navigate("AddFood", { foodId: id });
+	};
+
+	useEffect(() => {
+		setIsLoading(true);
+		loadProducts().then(() => {
+			setIsLoading(false);
+		});
+	}, [dispatch, loadProducts]);
+
+	const selectItemHandler = (id, title) => {
+		props.navigation.navigate("FoodDetail", {
+			foodId: id,
+			foodTitle: title,
+		});
 	};
 
 	const deleteHandler = (id) => {
@@ -41,7 +70,28 @@ const FoodDatabaseScreen = (props) => {
 		);
 	};
 
-	if (userFood.length === 0) {
+	if (error) {
+		return (
+			<View style={styles.centered}>
+				<Text>An error occurred!</Text>
+				<Button
+					title="Try again"
+					onPress={loadProducts}
+					color={Colors.primary}
+				/>
+			</View>
+		);
+	}
+
+	if (isLoading) {
+		return (
+			<View style={styles.centered}>
+				<ActivityIndicator size="large" color={Colors.primary} />
+			</View>
+		);
+	}
+
+	if (!isLoading && userFood.length === 0) {
 		return (
 			<View
 				style={{
@@ -57,6 +107,8 @@ const FoodDatabaseScreen = (props) => {
 
 	return (
 		<FlatList
+			// onRefresh={loadProducts}
+			// refreshing={isRefreshing}
 			data={userFood}
 			keyExtractor={(item) => item.id}
 			renderItem={(itemData) => (

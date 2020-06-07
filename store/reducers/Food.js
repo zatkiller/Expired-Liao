@@ -25,6 +25,7 @@ export default (state = initialState, action) => {
 				action.foodData.description,
 				action.foodData.price
 			);
+			console.log("food reducer creation");
 			return {
 				...state,
 				userFood: state.userFood.concat(newFood),
@@ -33,6 +34,7 @@ export default (state = initialState, action) => {
 			const foodIndex = state.userFood.findIndex(
 				(prod) => prod.id === action.pid
 			);
+			console.log("Updating2");
 			const updatedFood = new Food(
 				action.pid,
 				state.userFood[foodIndex].ownerId,

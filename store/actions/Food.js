@@ -83,7 +83,7 @@ export const createFood = (title, description, imageUrl, price) => {
 		);
 
 		const resData = await response.json();
-
+		console.log("Creating");
 		dispatch({
 			type: CREATE_FOOD,
 			foodData: {
@@ -99,6 +99,7 @@ export const createFood = (title, description, imageUrl, price) => {
 };
 
 export const updateFood = (id, title, description, imageUrl) => {
+	console.log("Updating");
 	return async (dispatch, getState) => {
 		const token = getState().auth.token;
 		const response = await fetch(
@@ -115,7 +116,7 @@ export const updateFood = (id, title, description, imageUrl) => {
 				}),
 			}
 		);
-
+		console.log("Updating");
 		if (!response.ok) {
 			throw new Error("Something went wrong!");
 		}
