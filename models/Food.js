@@ -6,13 +6,13 @@ class Food {
 	// 	this.date = date;
 	// 	this.quantity = quantity;
 	// }
-	constructor(id, ownerId, title, imageUrl, description, price) {
+	constructor(id, ownerId, title, imageUrl, date, quantity) {
 		this.id = id;
 		this.ownerId = ownerId;
 		this.imageUrl = imageUrl;
 		this.title = title;
-		this.description = description;
-		this.price = price;
+		this.date = date;
+		this.quantity = quantity;
 	}
 }
 

@@ -22,26 +22,25 @@ export default (state = initialState, action) => {
 				action.foodData.ownerId,
 				action.foodData.title,
 				action.foodData.imageUrl,
-				action.foodData.description,
-				action.foodData.price
+				action.foodData.date,
+				action.foodData.quantity
 			);
-			console.log("food reducer creation");
+
 			return {
 				...state,
 				userFood: state.userFood.concat(newFood),
 			};
 		case UPDATE_FOOD:
 			const foodIndex = state.userFood.findIndex(
-				(prod) => prod.id === action.pid
+				(food) => food.id === action.pid
 			);
-			console.log("Updating2");
 			const updatedFood = new Food(
 				action.pid,
 				state.userFood[foodIndex].ownerId,
 				action.foodData.title,
 				action.foodData.imageUrl,
-				action.foodData.description,
-				state.userFood[foodIndex].price
+				action.foodData.date,
+				action.foodData.quantity
 			);
 			const updatedUserFood = [...state.userFood];
 			updatedUserFood[foodIndex] = updatedFood;

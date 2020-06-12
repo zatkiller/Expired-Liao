@@ -14,12 +14,11 @@ import Colors from "../../constants/Colors";
 const FoodDetailScreen = (props) => {
 	const foodId = props.navigation.getParam("foodId");
 	const selectedFood = useSelector((state) =>
-		state.food.userFood.find((prod) => prod.id === foodId)
+		state.food.userFood.find((food) => food.id === foodId)
 	);
 	const editFoodHandler = (id) => {
 		props.navigation.navigate("AddFood", { foodId: id });
 	};
-	// const dispatch = useDispatch();
 
 	return (
 		<ScrollView>
@@ -27,6 +26,10 @@ const FoodDetailScreen = (props) => {
 				style={styles.image}
 				source={{ uri: selectedFood.imageUrl }}
 			/>
+			<Text style={styles.date}>Expiry Date: {selectedFood.date}</Text>
+			<Text style={styles.quantity}>
+				Quantity: {selectedFood.quantity}
+			</Text>
 			<View style={styles.actions}>
 				<Button
 					color={Colors.primary}
@@ -36,8 +39,6 @@ const FoodDetailScreen = (props) => {
 					}}
 				/>
 			</View>
-			<Text style={styles.price}>${selectedFood.price.toFixed(2)}</Text>
-			<Text style={styles.description}>{selectedFood.description}</Text>
 		</ScrollView>
 	);
 };
@@ -57,14 +58,14 @@ const styles = StyleSheet.create({
 		marginVertical: 10,
 		alignItems: "center",
 	},
-	price: {
+	date: {
 		fontSize: 20,
 		color: "#888",
 		textAlign: "center",
 		marginVertical: 20,
 		fontFamily: "open-sans-bold",
 	},
-	description: {
+	quantity: {
 		fontFamily: "open-sans",
 		fontSize: 14,
 		textAlign: "center",

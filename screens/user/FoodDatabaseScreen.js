@@ -100,7 +100,7 @@ const FoodDatabaseScreen = (props) => {
 					alignItems: "center",
 				}}
 			>
-				<Text>No food found, maybe start creating some?</Text>
+				<Text>No food found, start adding some!</Text>
 			</View>
 		);
 	}
@@ -115,7 +115,8 @@ const FoodDatabaseScreen = (props) => {
 				<FoodItem
 					image={itemData.item.imageUrl}
 					title={itemData.item.title}
-					price={itemData.item.price}
+					quantity={itemData.item.quantity}
+					date={itemData.item.date}
 					onSelect={() => {
 						selectFoodHandler(itemData.item.id);
 					}}

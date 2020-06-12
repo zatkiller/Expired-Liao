@@ -45,9 +45,9 @@ const AddFoodScreen = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState();
 
-	const prodId = props.navigation.getParam("foodId");
+	const foodId = props.navigation.getParam("foodId");
 	const editedFood = useSelector((state) =>
-		state.food.userFood.find((prod) => prod.id === prodId)
+		state.food.userFood.find((food) => food.id === foodId)
 	);
 	const dispatch = useDispatch();
 
@@ -55,14 +55,14 @@ const AddFoodScreen = (props) => {
 		inputValues: {
 			title: editedFood ? editedFood.title : "",
 			imageUrl: editedFood ? editedFood.imageUrl : "",
-			description: editedFood ? editedFood.description : "",
-			price: editedFood ? editedFood.description : "",
+			date: editedFood ? editedFood.date : "",
+			quantity: editedFood ? editedFood.quantity : "",
 		},
 		inputValidities: {
 			title: editedFood ? true : false,
 			imageUrl: editedFood ? true : false,
-			description: editedFood ? true : false,
-			price: editedFood ? true : false,
+			date: editedFood ? true : false,
+			quantity: editedFood ? true : false,
 		},
 		formIsValid: editedFood ? true : false,
 	});
@@ -88,19 +88,20 @@ const AddFoodScreen = (props) => {
 			if (editedFood) {
 				await dispatch(
 					foodActions.updateFood(
-						prodId,
+						foodId,
 						formState.inputValues.title,
-						formState.inputValues.description,
-						formState.inputValues.imageUrl
+						formState.inputValues.date,
+						formState.inputValues.imageUrl,
+						+formState.inputValues.quantity
 					)
 				);
 			} else {
 				await dispatch(
 					foodActions.createFood(
 						formState.inputValues.title,
-						formState.inputValues.description,
+						formState.inputValues.date,
 						formState.inputValues.imageUrl,
-						+formState.inputValues.price
+						+formState.inputValues.quantity
 					)
 				);
 			}
@@ -110,7 +111,7 @@ const AddFoodScreen = (props) => {
 		}
 
 		setIsLoading(false);
-	}, [dispatch, prodId, formState]);
+	}, [dispatch, foodId, formState]);
 
 	useEffect(() => {
 		props.navigation.setParams({ submit: submitHandler });
@@ -169,33 +170,32 @@ const AddFoodScreen = (props) => {
 						required
 					/>
 					<Input
-						id="price"
-						label="Price"
-						errorText="Please enter a valid price!"
+						id="quantity"
+						label="Quantity"
+						errorText="Please enter a valid quantity!"
 						keyboardType="decimal-pad"
 						returnKeyType="next"
 						onInputChange={inputChangeHandler}
 						initialValue={
-							editedFood ? editedFood.price.toString() : ""
+							editedFood ? editedFood.quantity.toString() : ""
 						}
 						initiallyValid={!!editedFood}
 						required
 						min={1}
 					/>
 					<Input
-						id="description"
-						label="Description"
-						errorText="Please enter a valid description!"
+						id="date"
+						label="Expiry Date (DD-MM-YYYY)"
 						keyboardType="default"
 						autoCapitalize="sentences"
 						autoCorrect
 						multiline
-						numberOfLines={3}
+						//numberOfLines={3}
 						onInputChange={inputChangeHandler}
-						initialValue={editedFood ? editedFood.description : ""}
+						initialValue={editedFood ? editedFood.date : ""}
 						initiallyValid={!!editedFood}
 						required
-						minLength={5}
+						//minLength={5}
 					/>
 				</View>
 			</ScrollView>

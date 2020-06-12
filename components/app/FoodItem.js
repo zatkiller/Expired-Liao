@@ -31,8 +31,11 @@ const FoodItem = (props) => {
 						</View>
 						<View style={styles.details}>
 							<Text style={styles.title}>{props.title}</Text>
-							<Text style={styles.price}>
-								${props.price.toFixed(2)}
+							<Text style={styles.date}>
+								Expiry Date: {props.date}
+							</Text>
+							<Text style={styles.quantity}>
+								Quantity: {props.quantity}
 							</Text>
 						</View>
 						<View style={styles.actions}>{props.children}</View>
@@ -73,7 +76,12 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		marginVertical: 2,
 	},
-	price: {
+	date: {
+		fontFamily: "open-sans",
+		fontSize: 16,
+		marginVertical: 1,
+	},
+	quantity: {
 		fontFamily: "open-sans",
 		fontSize: 14,
 		color: "#888",

@@ -27,8 +27,8 @@ export const fetchFood = () => {
 						resData[key].ownerId,
 						resData[key].title,
 						resData[key].imageUrl,
-						resData[key].description,
-						resData[key].price
+						resData[key].date,
+						resData[key].quantity
 					)
 				);
 			}
@@ -36,7 +36,7 @@ export const fetchFood = () => {
 			dispatch({
 				type: SET_FOOD,
 				food: loadedFood,
-				userFood: loadedFood.filter((prod) => prod.ownerId === userId),
+				userFood: loadedFood.filter((food) => food.ownerId === userId),
 			});
 		} catch (err) {
 			throw err;
@@ -61,7 +61,7 @@ export const deleteFood = (foodId) => {
 	};
 };
 
-export const createFood = (title, description, imageUrl, price) => {
+export const createFood = (title, date, imageUrl, quantity) => {
 	return async (dispatch, getState) => {
 		const token = getState().auth.token;
 		const userId = getState().auth.userId;
@@ -74,32 +74,30 @@ export const createFood = (title, description, imageUrl, price) => {
 				},
 				body: JSON.stringify({
 					title,
-					description,
+					date,
 					imageUrl,
-					price,
+					quantity,
 					ownerId: userId,
 				}),
 			}
 		);
 
 		const resData = await response.json();
-		console.log("Creating");
 		dispatch({
 			type: CREATE_FOOD,
 			foodData: {
 				id: resData.name,
 				title,
-				description,
+				date,
 				imageUrl,
-				price,
+				quantity,
 				ownerId: userId,
 			},
 		});
 	};
 };
 
-export const updateFood = (id, title, description, imageUrl) => {
-	console.log("Updating");
+export const updateFood = (id, title, date, imageUrl, quantity) => {
 	return async (dispatch, getState) => {
 		const token = getState().auth.token;
 		const response = await fetch(
@@ -111,12 +109,12 @@ export const updateFood = (id, title, description, imageUrl) => {
 				},
 				body: JSON.stringify({
 					title,
-					description,
+					date,
 					imageUrl,
+					quantity,
 				}),
 			}
 		);
-		console.log("Updating");
 		if (!response.ok) {
 			throw new Error("Something went wrong!");
 		}
@@ -126,8 +124,9 @@ export const updateFood = (id, title, description, imageUrl) => {
 			pid: id,
 			foodData: {
 				title,
-				description,
+				date,
 				imageUrl,
+				quantity,
 			},
 		});
 	};
