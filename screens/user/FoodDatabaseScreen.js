@@ -24,7 +24,7 @@ const FoodDatabaseScreen = (props) => {
 	const userFood = useSelector((state) => state.food.userFood);
 	const dispatch = useDispatch();
 
-	const loadProducts = useCallback(async () => {
+	const loadFood = useCallback(async () => {
 		setError(null);
 		setIsRefreshing(true);
 		try {
@@ -41,12 +41,12 @@ const FoodDatabaseScreen = (props) => {
 
 	useEffect(() => {
 		setIsLoading(true);
-		loadProducts().then(() => {
+		loadFood().then(() => {
 			setIsLoading(false);
 		});
-	}, [dispatch, loadProducts]);
+	}, [dispatch, loadFood]);
 
-	const selectItemHandler = (id, title) => {
+	const selectFoodHandler = (id, title) => {
 		props.navigation.navigate("FoodDetail", {
 			foodId: id,
 			foodTitle: title,
@@ -76,7 +76,7 @@ const FoodDatabaseScreen = (props) => {
 				<Text>An error occurred!</Text>
 				<Button
 					title="Try again"
-					onPress={loadProducts}
+					onPress={loadFood}
 					color={Colors.primary}
 				/>
 			</View>
@@ -107,8 +107,8 @@ const FoodDatabaseScreen = (props) => {
 
 	return (
 		<FlatList
-			// onRefresh={loadProducts}
-			// refreshing={isRefreshing}
+			onRefresh={loadFood}
+			refreshing={isRefreshing}
 			data={userFood}
 			keyExtractor={(item) => item.id}
 			renderItem={(itemData) => (
@@ -117,7 +117,7 @@ const FoodDatabaseScreen = (props) => {
 					title={itemData.item.title}
 					price={itemData.item.price}
 					onSelect={() => {
-						editFoodHandler(itemData.item.id);
+						selectFoodHandler(itemData.item.id);
 					}}
 				>
 					<Button

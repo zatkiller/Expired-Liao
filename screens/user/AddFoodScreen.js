@@ -56,7 +56,7 @@ const AddFoodScreen = (props) => {
 			title: editedFood ? editedFood.title : "",
 			imageUrl: editedFood ? editedFood.imageUrl : "",
 			description: editedFood ? editedFood.description : "",
-			price: "",
+			price: editedFood ? editedFood.description : "",
 		},
 		inputValidities: {
 			title: editedFood ? true : false,
@@ -139,7 +139,7 @@ const AddFoodScreen = (props) => {
 	return (
 		<KeyboardAvoidingView
 			style={{ flex: 1 }}
-			behavior="padding"
+			behavior="height"
 			keyboardVerticalOffset={100}
 		>
 			<ScrollView>
@@ -168,18 +168,20 @@ const AddFoodScreen = (props) => {
 						initiallyValid={!!editedFood}
 						required
 					/>
-					{editedFood ? null : (
-						<Input
-							id="price"
-							label="Price"
-							errorText="Please enter a valid price!"
-							keyboardType="decimal-pad"
-							returnKeyType="next"
-							onInputChange={inputChangeHandler}
-							required
-							min={1}
-						/>
-					)}
+					<Input
+						id="price"
+						label="Price"
+						errorText="Please enter a valid price!"
+						keyboardType="decimal-pad"
+						returnKeyType="next"
+						onInputChange={inputChangeHandler}
+						initialValue={
+							editedFood ? editedFood.price.toString() : ""
+						}
+						initiallyValid={!!editedFood}
+						required
+						min={1}
+					/>
 					<Input
 						id="description"
 						label="Description"

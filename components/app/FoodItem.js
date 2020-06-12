@@ -19,7 +19,7 @@ const FoodItem = (props) => {
 	}
 
 	return (
-		<Card style={styles.product}>
+		<Card style={styles.food}>
 			<View style={styles.touchable}>
 				<TouchableCmp onPress={props.onSelect} useForeground>
 					<View>
@@ -44,7 +44,7 @@ const FoodItem = (props) => {
 };
 
 const styles = StyleSheet.create({
-	product: {
+	food: {
 		height: 300,
 		margin: 20,
 	},
