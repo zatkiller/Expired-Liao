@@ -7,7 +7,7 @@ import {
 import Food from "../../models/Food";
 
 const initialState = {
-	userFood: [],
+	userFood: []
 };
 
 export default (state = initialState, action) => {
@@ -21,7 +21,6 @@ export default (state = initialState, action) => {
 				action.foodData.id,
 				action.foodData.ownerId,
 				action.foodData.title,
-				action.foodData.imageUrl,
 				action.foodData.date,
 				action.foodData.quantity
 			);
@@ -38,7 +37,6 @@ export default (state = initialState, action) => {
 				action.pid,
 				state.userFood[foodIndex].ownerId,
 				action.foodData.title,
-				action.foodData.imageUrl,
 				action.foodData.date,
 				action.foodData.quantity
 			);

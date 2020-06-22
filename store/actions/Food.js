@@ -26,7 +26,6 @@ export const fetchFood = () => {
 						key,
 						resData[key].ownerId,
 						resData[key].title,
-						resData[key].imageUrl,
 						resData[key].date,
 						resData[key].quantity
 					)
@@ -61,7 +60,7 @@ export const deleteFood = (foodId) => {
 	};
 };
 
-export const createFood = (title, date, imageUrl, quantity) => {
+export const createFood = (title, date, quantity) => {
 	return async (dispatch, getState) => {
 		const token = getState().auth.token;
 		const userId = getState().auth.userId;
@@ -75,7 +74,6 @@ export const createFood = (title, date, imageUrl, quantity) => {
 				body: JSON.stringify({
 					title,
 					date,
-					imageUrl,
 					quantity,
 					ownerId: userId,
 				}),
@@ -89,7 +87,6 @@ export const createFood = (title, date, imageUrl, quantity) => {
 				id: resData.name,
 				title,
 				date,
-				imageUrl,
 				quantity,
 				ownerId: userId,
 			},
@@ -97,7 +94,7 @@ export const createFood = (title, date, imageUrl, quantity) => {
 	};
 };
 
-export const updateFood = (id, title, date, imageUrl, quantity) => {
+export const updateFood = (id, title, date, quantity) => {
 	return async (dispatch, getState) => {
 		const token = getState().auth.token;
 		const response = await fetch(
@@ -110,7 +107,6 @@ export const updateFood = (id, title, date, imageUrl, quantity) => {
 				body: JSON.stringify({
 					title,
 					date,
-					imageUrl,
 					quantity,
 				}),
 			}
@@ -125,8 +121,7 @@ export const updateFood = (id, title, date, imageUrl, quantity) => {
 			foodData: {
 				title,
 				date,
-				imageUrl,
-				quantity,
+				quantity
 			},
 		});
 	};

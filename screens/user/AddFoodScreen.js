@@ -15,6 +15,7 @@ import HeaderButton from "../../components/UI/HeaderButton";
 import * as foodActions from "../../store/actions/food";
 import Input from "../../components/UI/Input";
 import Colors from "../../constants/Colors";
+import ImagePicker from '../../components/app/ImagePicker';
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
@@ -44,23 +45,24 @@ const formReducer = (state, action) => {
 const AddFoodScreen = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState();
+	const [selectedImage, setSelectedImage] = useState();
 
 	const foodId = props.navigation.getParam("foodId");
 	const editedFood = useSelector((state) =>
 		state.food.userFood.find((food) => food.id === foodId)
 	);
 	const dispatch = useDispatch();
-
+	
 	const [formState, dispatchFormState] = useReducer(formReducer, {
 		inputValues: {
 			title: editedFood ? editedFood.title : "",
-			imageUrl: editedFood ? editedFood.imageUrl : "",
+			//imageUri: editedFood ? editedFood.imageUri : "",
 			date: editedFood ? editedFood.date : "",
 			quantity: editedFood ? editedFood.quantity : "",
 		},
 		inputValidities: {
 			title: editedFood ? true : false,
-			imageUrl: editedFood ? true : false,
+			//imageUri: editedFood ? true : false,
 			date: editedFood ? true : false,
 			quantity: editedFood ? true : false,
 		},
@@ -72,6 +74,10 @@ const AddFoodScreen = (props) => {
 			Alert.alert("An error occurred!", error, [{ text: "Okay" }]);
 		}
 	}, [error]);
+
+	const imageTakenHandler = imagePath => {
+		setSelectedImage(imagePath);
+	};
 
 	const submitHandler = useCallback(async () => {
 		if (!formState.formIsValid) {
@@ -91,7 +97,7 @@ const AddFoodScreen = (props) => {
 						foodId,
 						formState.inputValues.title,
 						formState.inputValues.date,
-						formState.inputValues.imageUrl,
+						//formState.inputValues.imageUri,
 						+formState.inputValues.quantity
 					)
 				);
@@ -100,7 +106,7 @@ const AddFoodScreen = (props) => {
 					foodActions.createFood(
 						formState.inputValues.title,
 						formState.inputValues.date,
-						formState.inputValues.imageUrl,
+						//formState.inputValues.imageUri,
 						+formState.inputValues.quantity
 					)
 				);
@@ -158,17 +164,8 @@ const AddFoodScreen = (props) => {
 						initiallyValid={!!editedFood}
 						required
 					/>
-					<Input
-						id="imageUrl"
-						label="Image Url"
-						errorText="Please enter a valid image url!"
-						keyboardType="default"
-						returnKeyType="next"
-						onInputChange={inputChangeHandler}
-						initialValue={editedFood ? editedFood.imageUrl : ""}
-						initiallyValid={!!editedFood}
-						required
-					/>
+					
+					<ImagePicker onImageTaken={imageTakenHandler} />
 					<Input
 						id="quantity"
 						label="Quantity"

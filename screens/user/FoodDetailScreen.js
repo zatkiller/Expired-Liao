@@ -22,9 +22,10 @@ const FoodDetailScreen = (props) => {
 
 	return (
 		<ScrollView>
+			
 			<Image
 				style={styles.image}
-				source={{ uri: selectedFood.imageUrl }}
+				//source={{ uri: selectedFood.image }}
 			/>
 			<Text style={styles.date}>Expiry Date: {selectedFood.date}</Text>
 			<Text style={styles.quantity}>

@@ -113,7 +113,6 @@ const FoodDatabaseScreen = (props) => {
 			keyExtractor={(item) => item.id}
 			renderItem={(itemData) => (
 				<FoodItem
-					image={itemData.item.imageUrl}
 					title={itemData.item.title}
 					quantity={itemData.item.quantity}
 					date={itemData.item.date}
