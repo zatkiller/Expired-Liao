@@ -13,7 +13,7 @@ const STORE_URL = 'https://firebasestorage.googleapis.com/v0/b/expired-liao.apps
 const genImageUrl = (path) => `${STORE_URL}${encodeURIComponent(path)}?alt=media`;
 
 const ImgPicker = props => {
-    const [pickedImage, setPickedImage] = useState();
+    const [pickedImage, setPickedImage] = useState(props.imageUrl);
 
     const verifyPermissions = async () => {
         const result = await Permissions.askAsync(Permissions.CAMERA, Permissions.CAMERA_ROLL);

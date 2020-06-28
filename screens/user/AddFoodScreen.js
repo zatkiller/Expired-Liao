@@ -169,6 +169,7 @@ const AddFoodScreen = (props) => {
 					/>
 					<ImagePicker 
 						onImageTaken = {imageTakenHandler} 
+                        imageUrl={editedFood ? editedFood.imageUrl : ''}
 						/*updateImageUri = {setImageUrl}*/
 					/>
 					<Input
