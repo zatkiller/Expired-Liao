@@ -80,7 +80,7 @@ export const createFood = (title, date, imageUrl, quantity) => {
     const user = firebase.auth().currentUser;
     try {
       // pushes a new object under 'food' in the DB and sets that object's
-      // attributes
+      // attributes. I wonder what the UUID is like
       const response = await firebase.database().ref('food').push().set({
         title,
         date,
