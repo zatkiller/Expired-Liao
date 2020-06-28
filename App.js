@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import ReduxThunk from "redux-thunk";
-import * as firebase from "firebase";
+import * as firebase from 'firebase';
 
 import foodReducer from "./store/reducers/food";
 import authReducer from "./store/reducers/auth";
@@ -26,7 +26,10 @@ const firebaseConfig = {
 	measurementId: "G-GMT1M7HQSN"
   };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+var database = firebase.database('https://path-to-database.firebaseio.com/%27');
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

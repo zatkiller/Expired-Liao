@@ -4,6 +4,17 @@ export const DELETE_FOOD = "DELETE_FOOD";
 export const CREATE_FOOD = "CREATE_FOOD";
 export const UPDATE_FOOD = "UPDATE_FOOD";
 export const SET_FOOD = "SET_FOOD";
+import * as firebase from "firebase";
+
+function writeUserData(ownerId, title, date, imageUrl, quantity) {
+	firebase.database().ref('users/' + userId).set({
+	  ownerId: userId,
+	  title: title,
+	  date: date,
+	  imageUrl : imageUrl,
+	  quantity: quantity
+	});
+  }
 
 export const fetchFood = () => {
 	return async (dispatch, getState) => {
@@ -62,10 +73,19 @@ export const deleteFood = (foodId) => {
 };
 
 export const createFood = (title, date, imageUrl, quantity) => {
-	return async (dispatch, getState) => {
-        console.log(imageUrl);
-		const token = getState().auth.token;
-		const userId = getState().auth.userId;
+	return async (dispatch) => {
+        //console.log(imageUrl);
+		//const token = getState().auth.token;
+		const userId = firebase.auth().currentUser;
+		const response = await firebase.database().ref('users/' + userId).set({
+			title,
+			date,
+			imageUrl,
+			quantity,
+			ownerId: userId,
+		});
+		console.log(response);
+		/*
 		const response = await fetch(
 			`https://expired-liao.firebaseio.com/food.json?auth=${token}`,
 			{
@@ -81,20 +101,10 @@ export const createFood = (title, date, imageUrl, quantity) => {
 					ownerId: userId,
 				}),
 			}
-		);
+		); */
 
-		const resData = await response.json();
-		dispatch({
-			type: CREATE_FOOD,
-			foodData: {
-				id: resData.name,
-				title,
-				date,
-				imageUrl,
-				quantity,
-				ownerId: userId,
-			},
-		});
+		const resData = await response;
+		
 	};
 };
 

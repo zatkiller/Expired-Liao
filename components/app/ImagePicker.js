@@ -53,17 +53,17 @@ const ImgPicker = props => {
             const name = uuidv4();
             uploadImage(name, img.uri)
                 .then((res) => {
-                    console.log("Success", name, img, res);
+                    //console.log("Success", name, img, res);
                     Alert.alert("Success");
                     props.onImageTaken(genImageUrl(`images/${name}`));
                 })
                 .catch((error) => {
-                    console.log("Error", error);
+                    //console.log("Error", error);
                     Alert.alert("Error!");
                 });
         }
 
-        console.log(img);
+        //console.log(img);
         setPickedImage(img.uri); 
     };
     

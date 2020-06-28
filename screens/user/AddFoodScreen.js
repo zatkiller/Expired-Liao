@@ -181,7 +181,7 @@ const AddFoodScreen = (props) => {
 						onInputChange={inputChangeHandler}
 						initialValue={editedFood ? editedFood.imageUrl : imageUrl}
 						initiallyValid={!!editedFood}
-						required
+						//required
 					/>
 					<Input
 						id="quantity"
