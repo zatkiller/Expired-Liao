@@ -15,6 +15,8 @@ import HeaderButton from "../../components/UI/HeaderButton";
 import * as foodActions from "../../store/actions/food";
 import Input from "../../components/UI/Input";
 import Colors from "../../constants/Colors";
+import ImagePicker from "../../components/app/ImagePicker";
+import * as firebase from 'firebase';
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
@@ -43,6 +45,8 @@ const formReducer = (state, action) => {
 
 const AddFoodScreen = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
+	const [imageUrl, setImageUrl] = useState("");
+	const [selectedImage, setSelectedImage] = useState();
 	const [error, setError] = useState();
 
 	const foodId = props.navigation.getParam("foodId");
@@ -72,6 +76,10 @@ const AddFoodScreen = (props) => {
 			Alert.alert("An error occurred!", error, [{ text: "Okay" }]);
 		}
 	}, [error]);
+
+	const imageTakenHandler = imagePath => {
+		setSelectedImage(imagePath);
+	};
 
 	const submitHandler = useCallback(async () => {
 		if (!formState.formIsValid) {
@@ -158,6 +166,10 @@ const AddFoodScreen = (props) => {
 						initiallyValid={!!editedFood}
 						required
 					/>
+					<ImagePicker 
+						onImageTaken = {imageTakenHandler} 
+						/*updateImageUri = {setImageUrl}*/
+					/>
 					<Input
 						id="imageUrl"
 						label="Image Url"
@@ -165,7 +177,7 @@ const AddFoodScreen = (props) => {
 						keyboardType="default"
 						returnKeyType="next"
 						onInputChange={inputChangeHandler}
-						initialValue={editedFood ? editedFood.imageUrl : ""}
+						initialValue={editedFood ? editedFood.imageUrl : imageUrl}
 						initiallyValid={!!editedFood}
 						required
 					/>
