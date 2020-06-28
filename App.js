@@ -29,7 +29,6 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-var database = firebase.database('https://path-to-database.firebaseio.com/%27');
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

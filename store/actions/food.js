@@ -74,37 +74,20 @@ export const deleteFood = (foodId) => {
 
 export const createFood = (title, date, imageUrl, quantity) => {
 	return async (dispatch) => {
-        //console.log(imageUrl);
-		//const token = getState().auth.token;
-		const userId = firebase.auth().currentUser;
-		const response = await firebase.database().ref('users/' + userId).set({
-			title,
-			date,
-			imageUrl,
-			quantity,
-			ownerId: userId,
-		});
-		console.log(response);
-		/*
-		const response = await fetch(
-			`https://expired-liao.firebaseio.com/food.json?auth=${token}`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					title,
-					date,
-					imageUrl,
-					quantity,
-					ownerId: userId,
-				}),
-			}
-		); */
-
-		const resData = await response;
-		
+		const user = firebase.auth().currentUser;
+        try {
+            const response = await firebase.database().ref('food').push()
+                .set({
+                    title,
+                    date,
+                    imageUrl,
+                    quantity,
+                    ownerId: user.uid,
+                })
+            console.log(response);
+        } catch (err) {
+            console.log(err);
+        }
 	};
 };
 
