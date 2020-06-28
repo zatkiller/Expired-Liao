@@ -6,6 +6,7 @@ import {
 	AsyncStorage,
 } from "react-native";
 import { useDispatch } from "react-redux";
+import firebase from 'firebase';
 
 import Colors from "../constants/Colors";
 import * as authActions from "../store/actions/auth.js";
@@ -14,30 +15,18 @@ const StartupScreen = (props) => {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		const tryLogin = async () => {
-			const userData = await AsyncStorage.getItem("userData");
-			if (!userData) {
-				props.navigation.navigate("Auth");
-				return;
-			}
-			const transformedData = JSON.parse(userData);
-			const { token, userId, expiryDate } = transformedData;
-			const expirationDate = new Date(expiryDate);
-
-			if (expirationDate <= new Date() || !token || !userId) {
-				props.navigation.navigate("Auth");
-				return;
-			}
-
-			const expirationTime =
-				expirationDate.getTime() - new Date().getTime();
-
-			props.navigation.navigate("App");
-			dispatch(authActions.authenticate(userId, token, expirationTime));
-		};
-
-		tryLogin();
-	}, [dispatch]);
+        // not sure where to put this listener...
+        // this might not be the best place but seems to work fine
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                console.log('signed in:', user);
+                props.navigation.navigate("App");
+            } else {
+                console.log('not signed in');
+                props.navigation.navigate("Auth");
+            }
+        });
+	}, []);
 
 	return (
 		<View style={styles.screen}>

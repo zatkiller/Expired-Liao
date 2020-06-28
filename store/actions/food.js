@@ -63,6 +63,7 @@ export const deleteFood = (foodId) => {
 
 export const createFood = (title, date, imageUrl, quantity) => {
 	return async (dispatch, getState) => {
+        console.log(imageUrl);
 		const token = getState().auth.token;
 		const userId = getState().auth.userId;
 		const response = await fetch(

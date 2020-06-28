@@ -8,13 +8,15 @@ const NavigationContainer = (props) => {
 	const navRef = useRef();
 	const isAuth = useSelector((state) => !!state.auth.token);
 
-	useEffect(() => {
-		if (!isAuth) {
-			navRef.current.dispatch(
-				NavigationActions.navigate({ routeName: "Auth" })
-			);
-		}
-	}, [isAuth]);
+    // this has been commented out because we already have the listener in
+    // startupscreen
+	// useEffect(() => {
+	// 	if (!isAuth) {
+	// 		navRef.current.dispatch(
+	// 			NavigationActions.navigate({ routeName: "Auth" })
+	// 		);
+	// 	}
+	// }, [isAuth]);
 
 	return <AppNavigator ref={navRef} />;
 };

@@ -77,8 +77,9 @@ const AddFoodScreen = (props) => {
 		}
 	}, [error]);
 
-	const imageTakenHandler = imagePath => {
-		setSelectedImage(imagePath);
+	const imageTakenHandler = imageUrl => {
+		setSelectedImage(imageUrl);
+        setImageUrl(imageUrl);
 	};
 
 	const submitHandler = useCallback(async () => {
@@ -99,8 +100,8 @@ const AddFoodScreen = (props) => {
 						foodId,
 						formState.inputValues.title,
 						formState.inputValues.date,
-						formState.inputValues.imageUrl,
-						+formState.inputValues.quantity
+                        imageUrl,
+						formState.inputValues.quantity
 					)
 				);
 			} else {
@@ -108,8 +109,8 @@ const AddFoodScreen = (props) => {
 					foodActions.createFood(
 						formState.inputValues.title,
 						formState.inputValues.date,
-						formState.inputValues.imageUrl,
-						+formState.inputValues.quantity
+                        imageUrl,
+						formState.inputValues.quantity
 					)
 				);
 			}
