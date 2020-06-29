@@ -61,8 +61,8 @@ export const signup = (email, password) => {
 export const login = (email, password) => {
   console.log('login:', email, 'password:', password);
   return async (dispatch) => {
-    email = 'nig@ger.com';
-    password = '123123'; // to remove hardcoded values and fix form submit
+    //email = 'nig@ger.com';
+    //password = '123123'; // to remove hardcoded values and fix form submit
     // because form submit giving empty password
 
     try {

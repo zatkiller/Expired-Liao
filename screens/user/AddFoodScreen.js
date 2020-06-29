@@ -98,7 +98,7 @@ const AddFoodScreen = (props) => {
             foodId,
             formState.inputValues.title,
             formState.inputValues.date,
-            imageUrl,
+            imageUrl ? imageUrl : editedFood.imageUrl,
             formState.inputValues.quantity,
           ),
         );

@@ -23,15 +23,16 @@ export const fetchFood = () => {
   return async (dispatch, getState) => {
     try {
       const { uid } = firebase.auth().currentUser;
-      console.log(uid);
-      const response = (
-        await firebase
-          .database()
-          .ref('food')
-          .orderByChild('ownerId')
-          .equalTo(uid) // query only for results where ownerId==uid
-          .once('value')
-      ).val();
+      console.log('fetch food:', uid);
+      const response =
+        (
+          await firebase
+            .database()
+            .ref('food')
+            .orderByChild('ownerId')
+            .equalTo(uid) // query only for results where ownerId==uid
+            .once('value')
+        ).val() || {};
 
       console.log(response);
 
@@ -58,7 +59,6 @@ export const fetchFood = () => {
     }
   };
 };
-
 export const deleteFood = (foodId) => {
   return async (dispatch, getState) => {
     const token = getState().auth.token;
@@ -91,16 +91,16 @@ export const createFood = (title, date, imageUrl, quantity) => {
         })
         .getKey();
 
-      dispatch({
-        type: CREATE_FOOD,
-        pid: id,
-        foodData: {
-          title,
-          date,
-          imageUrl,
-          quantity,
-        },
-      });
+        dispatch({
+          type: CREATE_FOOD,
+          foodData: {
+            id,
+            title,
+            date,
+            imageUrl,
+            quantity,
+          },
+        });
     } catch (err) {
       console.log(err);
     }
