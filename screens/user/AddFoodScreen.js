@@ -64,7 +64,7 @@ const AddFoodScreen = (props) => {
     },
     inputValidities: {
       title: editedFood ? true : false,
-      imageUrl: editedFood ? true : false,
+      imageurl: true,
       date: editedFood ? true : false,
       quantity: editedFood ? true : false,
     },
@@ -170,7 +170,9 @@ const AddFoodScreen = (props) => {
             imageUrl={editedFood ? editedFood.imageUrl : ''}
             /*updateImageUri = {setImageUrl}*/
           />
-          <Input
+          
+          
+          {/* <Input
             id="imageUrl"
             label="Image Url"
             errorText="Please enter a valid image url!"
@@ -180,7 +182,8 @@ const AddFoodScreen = (props) => {
             initialValue={editedFood ? editedFood.imageUrl : imageUrl}
             initiallyValid={!!editedFood}
             //required
-          />
+          />  */}
+          
           <Input
             id="quantity"
             label="Quantity"
@@ -247,3 +250,4 @@ const styles = StyleSheet.create({
 });
 
 export default AddFoodScreen;
+""
