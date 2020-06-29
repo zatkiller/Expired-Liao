@@ -1,3 +1,5 @@
+import firebase from 'firebase';
+
 import { AUTHENTICATE, LOGOUT } from "../actions/auth";
 
 const initialState = {

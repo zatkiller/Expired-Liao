@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import ReduxThunk from "redux-thunk";
+import * as firebase from 'firebase';
 
 import foodReducer from "./store/reducers/food";
 import authReducer from "./store/reducers/auth";
@@ -13,6 +14,21 @@ const rootReducer = combineReducers({
 	food: foodReducer,
 	auth: authReducer,
 });
+
+const firebaseConfig = {
+	apiKey: "AIzaSyCokHRdBoHmUb8bfqcRTk79GBrkpXj1r5k",
+	authDomain: "expired-liao.firebaseapp.com",
+	databaseURL: "https://expired-liao.firebaseio.com",
+	projectId: "expired-liao",
+	storageBucket: "expired-liao.appspot.com",
+	messagingSenderId: "1098326579140",
+	appId: "1:1098326579140:web:6300ea6e28bb7b1ef33691",
+	measurementId: "G-GMT1M7HQSN"
+  };
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
