@@ -4,11 +4,22 @@ import { Provider } from "react-redux";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import ReduxThunk from "redux-thunk";
-import * as firebase from 'firebase';
+import * as firebase from "firebase";
+import { YellowBox } from "react-native";
+import _ from "lodash";
 
 import foodReducer from "./store/reducers/food";
 import authReducer from "./store/reducers/auth";
 import NavigationContainer from "./navigation/NavigationContainer";
+
+//Suppress yellow box warning caused by timer
+YellowBox.ignoreWarnings(["Setting a timer"]);
+const _console = _.clone(console);
+console.warn = (message) => {
+	if (message.indexOf("Setting a timer") <= -1) {
+		_console.warn(message);
+	}
+};
 
 const rootReducer = combineReducers({
 	food: foodReducer,
@@ -23,11 +34,11 @@ const firebaseConfig = {
 	storageBucket: "expired-liao.appspot.com",
 	messagingSenderId: "1098326579140",
 	appId: "1:1098326579140:web:6300ea6e28bb7b1ef33691",
-	measurementId: "G-GMT1M7HQSN"
-  };
+	measurementId: "G-GMT1M7HQSN",
+};
 
 if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+	firebase.initializeApp(firebaseConfig);
 }
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
