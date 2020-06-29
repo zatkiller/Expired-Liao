@@ -30,6 +30,7 @@ const FoodDatabaseScreen = (props) => {
 		try {
 			await dispatch(foodActions.fetchFood());
 		} catch (err) {
+			console.log(err);
 			setError(err.message);
 		}
 		setIsRefreshing(false);

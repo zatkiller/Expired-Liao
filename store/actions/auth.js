@@ -39,7 +39,6 @@ export const signup = (email, password) => {
 		}
 
 		const resData = await response.json();
-		console.log(resData);
 		dispatch(authenticate(resData.localId, resData.idToken));
 		saveDataToStorage(resData.idToken, resData.localId);
 	};
@@ -75,7 +74,6 @@ export const login = (email, password) => {
 		}
 
 		const resData = await response.json();
-		console.log(resData);
 		dispatch(authenticate(resData.localId, resData.idToken));
 
 		saveDataToStorage(resData.idToken, resData.localId);
