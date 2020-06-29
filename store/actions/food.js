@@ -21,38 +21,39 @@ function writeUserData(ownerId, title, date, imageUrl, quantity) {
 
 export const fetchFood = () => {
   return async (dispatch, getState) => {
-    const userId = getState().auth.userId;
     try {
-      const response = await fetch(
-        'https://expired-liao.firebaseio.com/food.json',
-      );
+      const { uid } = firebase.auth().currentUser;
+      console.log(uid);
+      const response = (
+        await firebase
+          .database()
+          .ref('food')
+          .orderByChild('ownerId')
+          .equalTo(uid) // query only for results where ownerId==uid
+          .once('value')
+      ).val();
 
-      if (!response.ok) {
-        throw new Error('Something went wrong!');
-      }
+      console.log(response);
 
-      const resData = await response.json();
-      const loadedFood = [];
-
-      for (const key in resData) {
-        loadedFood.push(
-          new Food(
-            key,
-            resData[key].ownerId,
-            resData[key].title,
-            resData[key].imageUrl,
-            resData[key].date,
-            resData[key].quantity,
-          ),
+      const loadedFood = Object.keys(response).map((foodId) => {
+        const food = response[foodId];
+        return new Food(
+          foodId,
+          food.ownerId,
+          food.title,
+          food.imageUrl,
+          food.date,
+          food.quantity,
         );
-      }
+      });
 
       dispatch({
         type: SET_FOOD,
         food: loadedFood,
-        userFood: loadedFood.filter((food) => food.ownerId === userId),
+        userFood: loadedFood,
       });
     } catch (err) {
+      console.log('fetchFood error:', err);
       throw err;
     }
   };
@@ -61,17 +62,16 @@ export const fetchFood = () => {
 export const deleteFood = (foodId) => {
   return async (dispatch, getState) => {
     const token = getState().auth.token;
-    const response = await fetch(
-      `https://expired-liao.firebaseio.com/food/${foodId}.json?auth=${token}`,
-      {
-        method: 'DELETE',
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error('Something went wrong!');
+    try {
+      console.log('delteFood:', foodId);
+      firebase
+        .database()
+        .ref('food/' + foodId)
+        .remove();
+      dispatch({ type: DELETE_FOOD, pid: foodId });
+    } catch (err) {
+      console.log('deleteFood error:', err);
     }
-    dispatch({ type: DELETE_FOOD, pid: foodId });
   };
 };
 
@@ -79,55 +79,62 @@ export const createFood = (title, date, imageUrl, quantity) => {
   return async (dispatch) => {
     const user = firebase.auth().currentUser;
     try {
-      // pushes a new object under 'food' in the DB and sets that object's
-      // attributes. I wonder what the UUID is like
-      const response = await firebase.database().ref('food').push().set({
-        title,
-        date,
-        imageUrl,
-        quantity,
-        ownerId: user.uid,
+      const id = firebase
+        .database()
+        .ref('food')
+        .push({
+          title,
+          date,
+          imageUrl,
+          quantity,
+          ownerId: user.uid,
+        })
+        .getKey();
+
+      dispatch({
+        type: CREATE_FOOD,
+        pid: id,
+        foodData: {
+          title,
+          date,
+          imageUrl,
+          quantity,
+        },
       });
-      console.log(response);
-      // probably wanna dispatch something here to add new food item to
-      // existing list of food items
     } catch (err) {
       console.log(err);
     }
   };
 };
 
-export const updateFood = (id, title, date, imageUrl, quantity) => {
-  return async (dispatch, getState) => {
-    const token = getState().auth.token;
-    const response = await fetch(
-      `https://expired-liao.firebaseio.com/food/${id}.json?auth=${token}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+export const updateFood = (foodId, title, date, imageUrl, quantity) => {
+  console.log(foodId, title, date, imageUrl, quantity);
+  return async (dispatch) => {
+    const user = firebase.auth().currentUser;
+    try {
+      firebase
+        .database()
+        .ref('/food/' + foodId)
+        .update({
           title,
           date,
           imageUrl,
           quantity,
-        }),
-      },
-    );
-    if (!response.ok) {
-      throw new Error('Something went wrong!');
-    }
+          ownerId: user.uid,
+        });
 
-    dispatch({
-      type: UPDATE_FOOD,
-      pid: id,
-      foodData: {
-        title,
-        date,
-        imageUrl,
-        quantity,
-      },
-    });
+      dispatch({
+        type: UPDATE_FOOD,
+        pid: foodId,
+        foodData: {
+          title,
+          date,
+          imageUrl,
+          quantity,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 };
