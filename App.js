@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
-import { AppLoading } from "expo";
+import { Permissions, Notifications, AppLoading } from "expo";
 import * as Font from "expo-font";
 import ReduxThunk from "redux-thunk";
 import * as firebase from "firebase";
@@ -42,6 +42,35 @@ if (!firebase.apps.length) {
 }
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
+
+//Adding Push Notifications
+registerForPushNotificationsAsync = async() => {
+
+	const { status: existingStatus } = await Permissions.getAsync(
+		Permissions.NOTIFICATIONS
+	);
+	let finalStatus = existingStatus;
+
+	// only ask if permissions have not already been determined, because
+	// IOS won't necessarily prompt the user a second time
+	if (existingStatus !== 'granted') {
+		//Android remote notification permissions are granted during the app 
+		// install, so this will only ask on IOS
+		const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+		finalStatus = status;
+	}
+
+	//Stop here if the user did not grant permissions
+	if (finalStatus !== 'granted') {
+		return;
+	}
+
+	//Get the token that uniquely identifies this device
+	let token = await Notifications.getExpoPushTokenAsync();
+
+	var updates = {}
+	updates['/expoToken'] = tokenfirebase.database().ref('users').child()
+}
 
 const fetchFonts = () => {
 	return Font.loadAsync({

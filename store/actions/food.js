@@ -6,19 +6,6 @@ export const UPDATE_FOOD = 'UPDATE_FOOD';
 export const SET_FOOD = 'SET_FOOD';
 import * as firebase from 'firebase';
 
-function writeUserData(ownerId, title, date, imageUrl, quantity) {
-  firebase
-    .database()
-    .ref('users/' + userId)
-    .set({
-      ownerId: userId,
-      title: title,
-      date: date,
-      imageUrl: imageUrl,
-      quantity: quantity,
-    });
-}
-
 export const fetchFood = () => {
   return async (dispatch, getState) => {
     try {

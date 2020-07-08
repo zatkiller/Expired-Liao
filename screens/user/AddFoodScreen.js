@@ -16,7 +16,6 @@ import * as foodActions from '../../store/actions/food';
 import Input from '../../components/UI/Input';
 import Colors from '../../constants/Colors';
 import ImagePicker from '../../components/app/ImagePicker';
-import * as firebase from 'firebase';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
