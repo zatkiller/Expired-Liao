@@ -15,9 +15,10 @@ const Example = () => {
 
   const handleConfirm = (date) => {
     console.warn("A date has been picked: ", date);
+    console.log(date);
     hideDatePicker();
   };
-
+  
   return (
     <View>
       <Button title="Show Date Picker" onPress={showDatePicker} />

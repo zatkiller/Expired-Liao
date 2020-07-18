@@ -49,7 +49,6 @@ const AddFoodScreen = (props) => {
   const [imageUrl, setImageUrl] = useState('');
   const [selectedImage, setSelectedImage] = useState();
   const [error, setError] = useState();
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const foodId = props.navigation.getParam('foodId');
   const editedFood = useSelector((state) =>
@@ -78,19 +77,6 @@ const AddFoodScreen = (props) => {
       Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
     }
   }, [error]);
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
-    hideDatePicker();
-  };
 
   const imageTakenHandler = (imageUrl) => {
     setSelectedImage(imageUrl);
