@@ -43,7 +43,7 @@ if (!firebase.apps.length) {
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
-//Adding Push Notifications
+//Adding Push Notifications.
 const registerForPushNotificationsAsync = async () => {
   const { status: existingStatus } = await Permissions.getAsync(
     Permissions.NOTIFICATIONS,
