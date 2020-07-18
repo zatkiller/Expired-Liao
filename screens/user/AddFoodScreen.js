@@ -1,6 +1,7 @@
 import React, { useState, useReducer, useEffect, useCallback } from 'react';
 import {
   View,
+  Button,
   ScrollView,
   StyleSheet,
   Platform,
@@ -10,13 +11,13 @@ import {
 } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
-import DatePicker from 'react-native-datepicker';
 
 import HeaderButton from '../../components/UI/HeaderButton';
 import * as foodActions from '../../store/actions/food';
 import Input from '../../components/UI/Input';
 import Colors from '../../constants/Colors';
 import ImagePicker from '../../components/app/ImagePicker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -48,6 +49,7 @@ const AddFoodScreen = (props) => {
   const [imageUrl, setImageUrl] = useState('');
   const [selectedImage, setSelectedImage] = useState();
   const [error, setError] = useState();
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const foodId = props.navigation.getParam('foodId');
   const editedFood = useSelector((state) =>
@@ -76,6 +78,19 @@ const AddFoodScreen = (props) => {
       Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
     }
   }, [error]);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    hideDatePicker();
+  };
 
   const imageTakenHandler = (imageUrl) => {
     setSelectedImage(imageUrl);
@@ -202,6 +217,15 @@ const AddFoodScreen = (props) => {
             required
             //minLength={5}
           />
+          <View>
+            <Button title="Show Date Picker" onPress={showDatePicker} />
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+          />
+         </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
