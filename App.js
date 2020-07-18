@@ -60,8 +60,6 @@ Notifications.setNotificationHandler({
   }),
 });
 
-
-
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);
 
@@ -81,8 +79,8 @@ export default function App() {
           title: 'Your food is going to expire!',
         },
         trigger: {
-          seconds: 5
-        }
+          seconds: 5,
+        },
       });
       console.log(id);
     }, 3000);
