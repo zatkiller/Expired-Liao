@@ -17,17 +17,15 @@ export const signup = (email, password) => {
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(
-        async () => {
-          var uid = await firebase.auth().currentUser.uid;
-          firebase.database().ref('users').child(uid).set({
-            email: email,
-            userId: uid
-          }); 
-        }
-      )
+      .then(async () => {
+        var uid = await firebase.auth().currentUser.uid;
+        firebase.database().ref('users').child(uid).set({
+          email: email,
+          userId: uid,
+        });
+      })
       .catch(function (error) {
-        console.log("fail lah bro");
+        console.log('fail lah bro');
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log('signup error:', errorCode, errorMessage);

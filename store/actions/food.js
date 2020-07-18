@@ -78,16 +78,16 @@ export const createFood = (title, date, imageUrl, quantity) => {
         })
         .getKey();
 
-        dispatch({
-          type: CREATE_FOOD,
-          foodData: {
-            id,
-            title,
-            date,
-            imageUrl,
-            quantity,
-          },
-        });
+      dispatch({
+        type: CREATE_FOOD,
+        foodData: {
+          id,
+          title,
+          date,
+          imageUrl,
+          quantity,
+        },
+      });
     } catch (err) {
       console.log(err);
     }

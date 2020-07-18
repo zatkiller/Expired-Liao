@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
+import DatePicker from 'react-native-datepicker';
 
 import HeaderButton from '../../components/UI/HeaderButton';
 import * as foodActions from '../../store/actions/food';
@@ -167,22 +168,7 @@ const AddFoodScreen = (props) => {
           <ImagePicker
             onImageTaken={imageTakenHandler}
             imageUrl={editedFood ? editedFood.imageUrl : ''}
-            /*updateImageUri = {setImageUrl}*/
           />
-          
-          
-          {/* <Input
-            id="imageUrl"
-            label="Image Url"
-            errorText="Please enter a valid image url!"
-            keyboardType="default"
-            returnKeyType="next"
-            onInputChange={inputChangeHandler}
-            initialValue={editedFood ? editedFood.imageUrl : imageUrl}
-            initiallyValid={!!editedFood}
-            //required
-          />  */}
-          
           <Input
             id="quantity"
             label="Quantity"
@@ -195,6 +181,13 @@ const AddFoodScreen = (props) => {
             required
             min={1}
           />
+          {/* <DatePicker */}
+          {/*   style={{ width: 200 }} */}
+          {/*   date={formState.inputValues.date} */}
+          {/*   id="date" */}
+          {/*   format="DD-MM-YYYY" */}
+          {/*   onDateChange={inputChangeHandler} */}
+          {/* /> */}
           <Input
             id="date"
             label="Expiry Date (DD-MM-YYYY)"
@@ -249,4 +242,4 @@ const styles = StyleSheet.create({
 });
 
 export default AddFoodScreen;
-""
+
