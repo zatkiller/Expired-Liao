@@ -77,8 +77,10 @@ const AuthScreen = (props) => {
         );
       } else {
         action = authActions.login(
-          formState.inputValues.email,
-          formState.inputValues.password,
+          // formState.inputValues.email,
+          // formState.inputValues.password,
+          'user@gmail.com',
+          'password',
         );
       }
       dispatch(action);

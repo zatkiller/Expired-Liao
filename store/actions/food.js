@@ -1,16 +1,39 @@
+import * as firebase from 'firebase';
+import { AsyncStorage } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import moment from 'moment';
+
 import Food from '../../models/Food';
 
 export const DELETE_FOOD = 'DELETE_FOOD';
 export const CREATE_FOOD = 'CREATE_FOOD';
 export const UPDATE_FOOD = 'UPDATE_FOOD';
 export const SET_FOOD = 'SET_FOOD';
-import * as firebase from 'firebase';
+
+const LOCAL_STORE_PREFIX = '@ExpiredLiao:';
+
+const asyncStoreSet = (key, value) => {
+  try {
+    AsyncStorage.setItem(`${LOCAL_STORE_PREFIX}:${key}`, value);
+  } catch (e) {
+    console.log('asyncStoreSet error', e);
+  }
+};
+
+const asyncStoreGet = async (key, value) => {
+  try {
+    const value = await AsyncStorage.getItem(`${LOCAL_STORE_PREFIX}:${key}`);
+    return value || '{}';
+  } catch (e) {
+    console.log('asyncStoreGet error', e);
+  }
+};
 
 export const fetchFood = () => {
   return async (dispatch, getState) => {
     try {
-      const { uid } = firebase.auth().currentUser;
-      console.log('fetch food:', uid);
+      const { uid, email: userEmail } = firebase.auth().currentUser;
+
       const response =
         (
           await firebase
@@ -20,8 +43,6 @@ export const fetchFood = () => {
             .equalTo(uid) // query only for results where ownerId==uid
             .once('value')
         ).val() || {};
-
-      console.log(response);
 
       const loadedFood = Object.keys(response).map((foodId) => {
         const food = response[foodId];
@@ -34,6 +55,40 @@ export const fetchFood = () => {
           food.quantity,
         );
       });
+
+      console.log(moment().format('DD-MM-YYYY'));
+
+      const STORE_KEY = 'userNotifData';
+      const userNotifData = JSON.parse(await asyncStoreGet(STORE_KEY));
+
+      // cancel all pending notifications for user with uid
+      if (userNotifData[uid] && userNotifData[uid].notifs) {
+        userNotifData[uid].notifs.forEach(({ notifId }) => {
+          Notifications.cancelScheduledNotificationAsync(notifId);
+        });
+      }
+
+      userNotifData[uid] = {
+        notifs: [],
+      };
+
+      // schedule notifications for all user uid's foods and
+      // store their notifIds in userNotifData[uid].notifs
+      loadedFood.forEach(async (food) => {
+        const notifId = await Notifications.scheduleNotificationAsync({
+          content: {
+            title: `${userEmail} expiry warning!`,
+            body: `${food.title} is expiring in 3 days on ${food.date}`,
+          },
+          trigger: {
+            seconds: 5,
+          },
+        });
+        userNotifData[uid].notifs.push({ foodId: food.id, notifId });
+      });
+
+      // update local async storage the new list of pending notifs for user
+      asyncStoreSet(STORE_KEY, JSON.stringify(userNotifData));
 
       dispatch({
         type: SET_FOOD,
