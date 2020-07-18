@@ -12,6 +12,14 @@ import foodReducer from './store/reducers/food';
 import authReducer from './store/reducers/auth';
 import NavigationContainer from './navigation/NavigationContainer';
 
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+	  shouldShowAlert: true,
+	  shouldPlaySound: false,
+	  shouldSetBadge: false,
+	}),
+  });
+
 //Suppress yellow box warning caused by timer
 YellowBox.ignoreWarnings(['Setting a timer']);
 const _console = _.clone(console);
@@ -43,32 +51,57 @@ if (!firebase.apps.length) {
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
-//Adding Push Notifications.
+
+
+const sendPushNotification = async(expoPushToken) => {
+	const message = {
+	  to: expoPushToken,
+	  sound: 'default',
+	  title: 'Original Title',
+	  body: 'And here is the body!',
+	  data: { data: 'goes here' },
+	};
+  
+	await fetch('https://exp.host/--/api/v2/push/send', {
+	  method: 'POST',
+	  headers: {
+		Accept: 'application/json',
+		'Accept-encoding': 'gzip, deflate',
+		'Content-Type': 'application/json',
+	  },
+	  body: JSON.stringify(message),
+	});
+  }
+
 const registerForPushNotificationsAsync = async () => {
-  const { status: existingStatus } = await Permissions.getAsync(
-    Permissions.NOTIFICATIONS,
-  );
-  let finalStatus = existingStatus;
-
-  // only ask if permissions have not already been determined, because
-  // IOS won't necessarily prompt the user a second time
-  if (existingStatus !== 'granted') {
-    //Android remote notification permissions are granted during the app
-    // install, so this will only ask on IOS
-    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-    finalStatus = status;
-  }
-
-  //Stop here if the user did not grant permissions
-  if (finalStatus !== 'granted') {
-    return;
-  }
-
-  //Get the token that uniquely identifies this device
-  let token = await Notifications.getExpoPushTokenAsync();
-
-  var updates = {};
-  updates['/expoToken'] = tokenfirebase.database().ref('users').child();
+	let token;
+	if (Constants.isDevice) {
+	  const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+	  let finalStatus = existingStatus;
+	  if (existingStatus !== 'granted') {
+		const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+		finalStatus = status;
+	  }
+	  if (finalStatus !== 'granted') {
+		alert('Failed to get push token for push notification!');
+		return;
+	  }
+	  token = (await Notifications.getExpoPushTokenAsync()).data;
+	  console.log(token);
+	} else {
+	  alert('Must use physical device for Push Notifications');
+	}
+  
+	if (Platform.OS === 'android') {
+	  Notifications.setNotificationChannelAsync('default', {
+		name: 'default',
+		importance: Notifications.AndroidImportance.MAX,
+		vibrationPattern: [0, 250, 250, 250],
+		lightColor: '#FF231F7C',
+	  });
+	}
+  
+	return token;
 };
 
 const fetchFonts = () => {
@@ -80,7 +113,43 @@ const fetchFonts = () => {
 
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+        const localNotification = {
+            title: 'done',
+            body: 'done!'
+        };
+
+        const schedulingOptions = {
+            time: (new Date()).getTime() + 10
+        }
+
+        // Notifications show only when app is not active.
+        // (ie. another app being used or device's screen is locked)
+        Notifications.scheduleLocalNotificationAsync(
+            localNotification, schedulingOptions
+        );
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+  
   if (!fontLoaded) {
     return (
       <AppLoading
