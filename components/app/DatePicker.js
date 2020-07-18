@@ -5,6 +5,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 const Example = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -18,7 +19,7 @@ const Example = () => {
     console.log(date);
     hideDatePicker();
   };
-  
+
   return (
     <View>
       <Button title="Show Date Picker" onPress={showDatePicker} />

@@ -47,6 +47,7 @@ const formReducer = (state, action) => {
 const AddFoodScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  const [date, setDate] = useState('');
   const [selectedImage, setSelectedImage] = useState();
   const [error, setError] = useState();
 
@@ -83,6 +84,11 @@ const AddFoodScreen = (props) => {
     setImageUrl(imageUrl);
   };
 
+  const dateHandler = (date) => {
+    console.log(date);
+    setDate(date);
+  }
+
   const submitHandler = useCallback(async () => {
     if (!formState.formIsValid) {
       Alert.alert('Wrong input!', 'Please check the errors in the form.', [
@@ -98,7 +104,8 @@ const AddFoodScreen = (props) => {
           foodActions.updateFood(
             foodId,
             formState.inputValues.title,
-            formState.inputValues.date,
+            date ? date : editedFood.date,
+            //formState.inputValues.date,
             imageUrl ? imageUrl : editedFood.imageUrl,
             formState.inputValues.quantity,
           ),
@@ -107,7 +114,8 @@ const AddFoodScreen = (props) => {
         await dispatch(
           foodActions.createFood(
             formState.inputValues.title,
-            formState.inputValues.date,
+            //formState.inputValues.date,
+            date,
             imageUrl,
             formState.inputValues.quantity,
           ),
@@ -189,7 +197,7 @@ const AddFoodScreen = (props) => {
           {/*   format="DD-MM-YYYY" */}
           {/*   onDateChange={inputChangeHandler} */}
           {/* /> */}
-          <Input
+          {/* <Input
             id="date"
             label="Expiry Date (DD-MM-YYYY)"
             keyboardType="default"
@@ -197,13 +205,16 @@ const AddFoodScreen = (props) => {
             autoCorrect
             multiline
             //numberOfLines={3}
-            onInputChange={inputChangeHandler}
-            initialValue={editedFood ? editedFood.date : ''}
+            //onInputChange={inputChangeHandler}
+            //initialValue={editedFood ? editedFood.date : ''}
             initiallyValid={!!editedFood}
             required
             //minLength={5}
-          />
-          <DatePicker />
+          /> */}
+          <DatePicker 
+            //onConfirm={dateHandler}
+            date={editedFood ? editedFood.date : ''}
+            />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
