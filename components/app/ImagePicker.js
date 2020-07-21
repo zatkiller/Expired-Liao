@@ -8,13 +8,12 @@ import {
   StyleSheet,
   Alert,
   CameraRoll,
+  TouchableOpacity,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as firebase from 'firebase';
 import { v4 as uuidv4 } from 'uuid';
-
-//import Colors from '../constants/Colors';
 
 const STORE_URL =
   'https://firebasestorage.googleapis.com/v0/b/expired-liao.appspot.com/o/';
@@ -22,8 +21,25 @@ const STORE_URL =
 const genImageUrl = (path) =>
   `${STORE_URL}${encodeURIComponent(path)}?alt=media`;
 
-const ImgPicker = (props) => {
-  const [pickedImage, setPickedImage] = useState(props.imageUrl);
+const styles = StyleSheet.create({
+  imagePicker: {
+    alignItems: 'center',
+    margin: 15,
+  },
+  imagePreview: {
+    width: '100%',
+    height: 200,
+    marginTop: 20,
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: '#ccc',
+    borderWidth: 1,
+  },
+});
+
+const ImgPicker = ({ imageUrl, onImageTaken }) => {
+  const [pickedImage, setPickedImage] = useState(imageUrl);
 
   const verifyPermissions = async () => {
     const result = await Permissions.askAsync(
@@ -56,7 +72,7 @@ const ImgPicker = (props) => {
       return;
     }
 
-    let img = await ImagePicker.launchCameraAsync({
+    const img = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [16, 9],
       quality: 1,
@@ -66,52 +82,27 @@ const ImgPicker = (props) => {
       const name = uuidv4();
       uploadImage(name, img.uri)
         .then((res) => {
-          //console.log("Success", name, img, res);
-          Alert.alert('Success');
-          props.onImageTaken(genImageUrl(`images/${name}`));
+          onImageTaken(genImageUrl(`images/${name}`));
+          // Alert.alert('Your image has been uploaded!');
         })
         .catch((error) => {
-          //console.log("Error", error);
-          Alert.alert('Error!');
+          console.log('onImageTaken error:', error);
+          Alert.alert('Image taken error!');
         });
     }
 
-    //console.log(img);
     setPickedImage(img.uri);
   };
 
   return (
-    <View style={styles.imagePicker}>
-      <View style={styles.imagePreview}>
-        {!pickedImage ? (
-          <Text> No image picked yet.</Text>
-        ) : (
-          <Image style={styles.imagePreview} source={{ uri: pickedImage }} />
-        )}
-      </View>
-      <Button
-        title="Take Img"
-        //color = {Colors.primary}
-        onPress={takeImageHandler}
-      />
-    </View>
+    <TouchableOpacity onPress={takeImageHandler} style={styles.imagePreview}>
+      {!pickedImage ? (
+        <Text>Snap a Picture!</Text>
+      ) : (
+        <Image style={styles.imagePreview} source={{ uri: pickedImage }} />
+      )}
+    </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  imagePicker: {
-    alignItems: 'center',
-    margin: 15,
-  },
-  imagePreview: {
-    width: '100%',
-    height: 200,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#ccc',
-    borderWidth: 1,
-  },
-});
 
 export default ImgPicker;
