@@ -13,10 +13,12 @@ export const SET_FOOD = 'SET_FOOD';
 
 const LOCAL_STORE_PREFIX = '@ExpiredLiao:';
 
+const userNotifData = {};
+
 // helper function to set value in asyncstorage
-const asyncStoreSet = (key, value) => {
+const asyncStoreSet = async (key, value) => {
   try {
-    AsyncStorage.setItem(`${LOCAL_STORE_PREFIX}:${key}`, value);
+    await AsyncStorage.setItem(`${LOCAL_STORE_PREFIX}:${key}`, value);
   } catch (e) {
     console.log('asyncStoreSet error', e);
   }
@@ -43,7 +45,7 @@ const scheduleNotif = async (userEmail, food) => {
       body: `${food.title} is expiring in 3 days on ${food.date}`,
     },
     trigger: {
-      seconds: 5,
+      seconds: 10,
     },
   });
 
@@ -80,7 +82,9 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
   });
 
   // update local async storage the new list of pending notifs for user
-  asyncStoreSet(STORE_KEY, JSON.stringify(userNotifData));
+  await asyncStoreSet(STORE_KEY, JSON.stringify(userNotifData));
+  console.log(userNotifData);
+  console.log('done setting up notifications');
 };
 
 const removeNotif = async (userId, userEmail, foodId) => {
@@ -92,8 +96,11 @@ const removeNotif = async (userId, userEmail, foodId) => {
 
   // add only to tempNotifs notifs which aren't the one we wanna remove
   // and cancel the removed food's notif
+  console.log(foodId);
+  console.log(userNotifData);
   userNotifData[userId].notifs.forEach((notif) => {
     if (notif.foodId === foodId) {
+      console.log('cancelled', notif.notifId);
       Notifications.cancelScheduledNotificationAsync(notif.notifId);
     } else {
       tempNotifs.push(notif);
@@ -169,13 +176,11 @@ export const fetchFood = () => async (dispatch, getState) => {
   }
 };
 export const deleteFood = (foodId) => async (dispatch, getState) => {
-  const { token } = getState().auth;
+  const { uid: userId, email: userEmail } = firebase.auth().currentUser;
   try {
-    console.log('delteFood:', foodId);
+    console.log('deleteFood:', foodId);
     firebase.database().ref(`food/${foodId}`).remove();
     dispatch({ type: DELETE_FOOD, pid: foodId });
-
-    const { uid: userId, email: userEmail } = firebase.auth().currentUser;
     removeNotif(userId, userEmail, foodId);
   } catch (err) {
     console.log('deleteFood error:', err);
