@@ -49,8 +49,10 @@ const AuthScreen = (props) => {
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
-      email: '',
-      password: '',
+      email: 'user@gmail.com',
+      password: 'password',
+      // email: '',
+      // password: '',
     },
     inputValidities: {
       email: false,
@@ -77,8 +79,10 @@ const AuthScreen = (props) => {
         );
       } else {
         action = authActions.login(
-          formState.inputValues.email,
-          formState.inputValues.password,
+          // formState.inputValues.email,
+          // formState.inputValues.password,
+          'user@gmail.com',
+          'password',
         );
       }
       dispatch(action);
@@ -120,7 +124,7 @@ const AuthScreen = (props) => {
               autoCapitalize="none"
               errorText="Please enter a valid email address."
               onInputChange={inputChangeHandler}
-              initialValue=""
+              initialValue={formState.inputValues.email}
             />
             <Input
               id="password"
@@ -132,7 +136,7 @@ const AuthScreen = (props) => {
               autoCapitalize="none"
               errorText="Please enter a valid password."
               onInputChange={inputChangeHandler}
-              initialValue=""
+              initialValue={formState.inputValues.password}
             />
             <View style={styles.buttonContainer}>
               {isLoading ? (

@@ -1,5 +1,6 @@
 import React, { useState, useReducer, useEffect, useCallback } from 'react';
 import {
+  TextInput,
   View,
   Button,
   ScrollView,
@@ -11,6 +12,7 @@ import {
 } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
+import moment from 'moment';
 
 import HeaderButton from '../../components/UI/HeaderButton';
 import * as foodActions from '../../store/actions/food';
@@ -18,6 +20,17 @@ import Input from '../../components/UI/Input';
 import Colors from '../../constants/Colors';
 import ImagePicker from '../../components/app/ImagePicker';
 import DatePicker from '../../components/app/DatePicker';
+
+const styles = StyleSheet.create({
+  form: {
+    margin: 20,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -31,12 +44,11 @@ const formReducer = (state, action) => {
       ...state.inputValidities,
       [action.input]: action.isValid,
     };
-    let updatedFormIsValid = true;
-    for (const key in updatedValidities) {
-      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
-    }
     return {
-      formIsValid: updatedFormIsValid,
+      formIsValid: Object.values(updatedValidities).reduce(
+        (prev, cur) => prev && cur,
+        true,
+      ),
       inputValidities: updatedValidities,
       inputValues: updatedValues,
     };
@@ -46,9 +58,6 @@ const formReducer = (state, action) => {
 
 const AddFoodScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
-  const [selectedImage, setSelectedImage] = useState();
-  const [error, setError] = useState();
 
   const foodId = props.navigation.getParam('foodId');
   const editedFood = useSelector((state) =>
@@ -64,62 +73,54 @@ const AddFoodScreen = (props) => {
       quantity: editedFood ? editedFood.quantity : '',
     },
     inputValidities: {
-      title: editedFood ? true : false,
+      title: !!editedFood,
       imageurl: true,
-      date: editedFood ? true : false,
-      quantity: editedFood ? true : false,
+      date: !!editedFood,
+      quantity: !!editedFood,
     },
-    formIsValid: editedFood ? true : false,
+    formIsValid: !!editedFood,
   });
 
-  useEffect(() => {
-    if (error) {
-      Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
-    }
-  }, [error]);
-
-  const imageTakenHandler = (imageUrl) => {
-    setSelectedImage(imageUrl);
-    setImageUrl(imageUrl);
+  const [imageUrl, setImageUrl] = useState('');
+  const imageTakenHandler = (url) => {
+    setImageUrl(url);
   };
 
-  const submitHandler = useCallback(async () => {
+  // update food not working for some reason
+  // state updates not working. Could be the callback function
+  const submitHandler = useCallback(() => {
     if (!formState.formIsValid) {
       Alert.alert('Wrong input!', 'Please check the errors in the form.', [
         { text: 'Okay' },
       ]);
       return;
     }
-    setError(null);
     setIsLoading(true);
-    try {
-      if (editedFood) {
-        await dispatch(
-          foodActions.updateFood(
-            foodId,
-            formState.inputValues.title,
-            formState.inputValues.date,
-            imageUrl ? imageUrl : editedFood.imageUrl,
-            formState.inputValues.quantity,
-          ),
-        );
-      } else {
-        await dispatch(
-          foodActions.createFood(
-            formState.inputValues.title,
-            formState.inputValues.date,
-            imageUrl,
-            formState.inputValues.quantity,
-          ),
-        );
-      }
-      props.navigation.goBack();
-    } catch (err) {
-      setError(err.message);
+
+    if (editedFood) {
+      dispatch(
+        foodActions.updateFood(
+          foodId,
+          formState.inputValues.title,
+          formState.inputValues.date,
+          imageUrl ? imageUrl : editedFood.imageUrl,
+          formState.inputValues.quantity,
+        ),
+      );
+    } else {
+      dispatch(
+        foodActions.createFood(
+          formState.inputValues.title,
+          formState.inputValues.date,
+          imageUrl,
+          formState.inputValues.quantity,
+        ),
+      );
     }
+    props.navigation.goBack();
 
     setIsLoading(false);
-  }, [dispatch, foodId, formState]);
+  }, [dispatch, foodId, formState, imageUrl]);
 
   useEffect(() => {
     props.navigation.setParams({ submit: submitHandler });
@@ -174,7 +175,7 @@ const AddFoodScreen = (props) => {
             id="quantity"
             label="Quantity"
             errorText="Please enter a valid quantity!"
-            keyboardType="decimal-pad"
+            keyboardType="numeric"
             returnKeyType="next"
             onInputChange={inputChangeHandler}
             initialValue={editedFood ? editedFood.quantity.toString() : ''}
@@ -182,28 +183,21 @@ const AddFoodScreen = (props) => {
             required
             min={1}
           />
-          {/* <DatePicker */}
-          {/*   style={{ width: 200 }} */}
-          {/*   date={formState.inputValues.date} */}
-          {/*   id="date" */}
-          {/*   format="DD-MM-YYYY" */}
-          {/*   onDateChange={inputChangeHandler} */}
-          {/* /> */}
           <Input
             id="date"
             label="Expiry Date (DD-MM-YYYY)"
-            keyboardType="default"
-            autoCapitalize="sentences"
-            autoCorrect
-            multiline
-            //numberOfLines={3}
-            onInputChange={inputChangeHandler}
-            initialValue={editedFood ? editedFood.date : ''}
-            initiallyValid={!!editedFood}
-            required
-            //minLength={5}
+            value={formState.inputValues.date}
+            style={{ marginBottom: 10 }}
+            editable={false}
           />
-          <DatePicker />
+          <DatePicker
+            initialValue={
+              editedFood
+                ? moment(editedFood.date, 'DD-MM-YYYY').toDate()
+                : moment().toDate()
+            }
+            setDate={(date) => inputChangeHandler('date', date, true)}
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -216,32 +210,18 @@ AddFoodScreen.navigationOptions = (navData) => {
     headerTitle: navData.navigation.getParam('foodId')
       ? 'Edit Food'
       : 'Add Food',
-    headerRight: () => {
-      return (
-        <HeaderButtons HeaderButtonComponent={HeaderButton}>
-          <Item
-            title="Save"
-            iconName={
-              Platform.OS === 'android' ? 'md-checkmark' : 'ios-checkmark'
-            }
-            onPress={submitFn}
-          />
-        </HeaderButtons>
-      );
-    },
+    headerRight: () => (
+      <HeaderButtons HeaderButtonComponent={HeaderButton}>
+        <Item
+          title="Save"
+          iconName={
+            Platform.OS === 'android' ? 'md-checkmark' : 'ios-checkmark'
+          }
+          onPress={submitFn}
+        />
+      </HeaderButtons>
+    ),
   };
 };
 
-const styles = StyleSheet.create({
-  form: {
-    margin: 20,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
 export default AddFoodScreen;
-

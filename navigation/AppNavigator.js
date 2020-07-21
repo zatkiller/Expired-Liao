@@ -50,7 +50,7 @@ const FoodDatabaseNavigator = createStackNavigator(
 
 const ReportNavigator = createStackNavigator(
   {
-    Report: Report,
+    Report,
   },
   {
     navigationOptions: {
