@@ -14,7 +14,7 @@ import foodReducer from './store/reducers/food';
 import authReducer from './store/reducers/auth';
 import NavigationContainer from './navigation/NavigationContainer';
 
-//Suppress yellow box warning caused by timer
+// Suppress yellow box warning caused by timer
 YellowBox.ignoreWarnings(['Setting a timer']);
 const _console = _.clone(console);
 console.warn = (message) => {

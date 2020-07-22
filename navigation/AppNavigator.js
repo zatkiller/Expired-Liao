@@ -13,7 +13,7 @@ import Report from '../screens/user/ReportScreen';
 import AuthScreen from '../screens/login/AuthenticationScreen';
 import StartupScreen from '../screens/StartupScreen';
 import Colors from '../constants/Colors';
-import * as authActions from '../store/actions/auth.js';
+import * as authActions from '../store/actions/auth';
 
 const defaultNavOptions = {
   headerStyle: {

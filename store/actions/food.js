@@ -41,11 +41,11 @@ const STORE_KEY = 'userNotifData';
 const scheduleNotif = async (userEmail, food) => {
   const notifId = await Notifications.scheduleNotificationAsync({
     content: {
-      title: `${userEmail} expiry warning!`,
+      title: `${userEmail}: expiry warning!`,
       body: `${food.title} is expiring in 3 days on ${food.date}`,
     },
     trigger: {
-      seconds: 10,
+      seconds: 100,
     },
   });
 
