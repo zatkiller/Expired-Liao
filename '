@@ -4,7 +4,6 @@ import { Button } from 'react-native-elements';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import moment from 'moment';
 import Svg, { Circle, ForeignObject } from 'react-native-svg';
-import { useSelector } from 'react-redux';
 
 import HeaderButton from '../../components/UI/HeaderButton';
 import Colors from '../../constants/Colors';
@@ -24,12 +23,7 @@ const styles = StyleSheet.create({
   containerBtm: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  buttonContainer: {
-    position: 'absolute',
-    top: 50,
+    paddingBottom: -50,
   },
   button: {
     backgroundColor: Colors.primary,
@@ -40,24 +34,18 @@ const styles = StyleSheet.create({
 
 const CIRCLE_RADIUS = 49;
 
-const isExpired = ({ date }) => {
-  return (
-    moment(date, 'DD-MM-YYYY') <
-    moment(moment().format('DD-MM-YYYY'), 'DD-MM-YYYY')
-  );
-};
+const isExpired = (food) => true;
 
-const ReportScreen = ({ navigation }) => {
-  const foodList = useSelector(
-    (state) => state.food.userFood,
-  ).filter(({ date }) => moment(date, 'DD-MM-YYYY').isSame(moment(), 'month'));
+const ReportScreen = ({ foodList }) => {
+  // const numberExpired = foodList.reduce(
+  //   (acc, cur) => acc + isExpired(cur) * 1,
+  //   0,
+  // );
 
-  const numberExpired = foodList.reduce(
-    (acc, cur) => acc + isExpired(cur) * 1,
-    0,
-  );
+  // const percentageExpired = numberExpired / foodList.length;
 
-  const fractionExpired = numberExpired / foodList.length;
+  const numberExpired = 5;
+  const fractionExpired = numberExpired / 21;
   const percentageExpired = 100 * fractionExpired;
 
   const circumference = 2 * Math.PI * CIRCLE_RADIUS;
@@ -126,13 +114,9 @@ const ReportScreen = ({ navigation }) => {
       </View>
       <View style={styles.containerBtm}>
         <Button
-          onPress={() => {
-            navigation.navigate('Food');
-          }}
           title="VIEW"
           raised
           titleStyle={{ fontSize: 22 }}
-          containerStyle={styles.buttonContainer}
           buttonStyle={styles.button}
         />
       </View>

@@ -39,17 +39,17 @@ const STORE_KEY = 'userNotifData';
 
 // helper function to schedule notif and return notif id
 const scheduleNotif = async (userEmail, food) => {
-  const notifId = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: `${userEmail}: expiry warning!`,
-      body: `${food.title} is expiring in 3 days on ${food.date}`,
-    },
-    trigger: {
-      seconds: 100,
-    },
-  });
+  // const notifId = await Notifications.scheduleNotificationAsync({
+  //   content: {
+  //     title: `${userEmail}: expiry warning!`,
+  //     body: `${food.title} is expiring in 3 days on ${food.date}`,
+  //   },
+  //   trigger: {
+  //     seconds: 100,
+  //   },
+  // });
 
-  return notifId;
+  return 5;
 };
 
 // helper function for initial set up of push notifications
