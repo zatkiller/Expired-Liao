@@ -80,9 +80,6 @@ const scheduleNotif = async (userEmail, food) => {
 
 // helper function for initial set up of push notifications
 const setUpNotifs = async (userId, userEmail, loadedFood) => {
-  Notifications.cancelAllScheduledNotificationsAsync();
-  AsyncStorage.clear();
-  return;
   // set up push notifications only if we're on a physical android/ios
   if (!Constants.isDevice || Constants.platform.web) return;
 
