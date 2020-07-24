@@ -85,21 +85,12 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
 
   console.log('setUpNotifs', moment().format('DD-MM-YYYY'));
 
-  const testing = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'test title',
-      body: 'test body',
-    },
-    trigger: { seconds: 5 },
-  });
-  console.log(testing);
-
   const userNotifData = JSON.parse(await asyncStoreGet(STORE_KEY));
 
   // cancel all pending notifications for user with uid
   if (userNotifData[userId] && userNotifData[userId].notifs) {
     userNotifData[userId].notifs.forEach(({ notifIds }) => {
-      notifIds.forEach((notifId) => {
+      (notifIds || []).forEach((notifId) => {
         Notifications.cancelScheduledNotificationAsync(notifId);
       });
     });
@@ -109,6 +100,8 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
     scheduleNotif(userEmail, food),
   );
 
+  // schedule notifications for all user uid's foods and
+  // store their notifIds in userNotifData[uid].notifs
   userNotifData[userId] = {
     notifs: (await Promise.all(notifPromises)).map((notifId, index) => ({
       notifId,
@@ -116,32 +109,15 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
     })),
   };
 
-  // schedule notifications for all user uid's foods and
-  // store their notifIds in userNotifData[uid].notifs
-  // await loadedFood.forEach(async (food) => {
-  //   const notifIds = await scheduleNotif(userEmail, food);
-
-  //   userNotifData[userId].notifs.push({
-  //     foodId: food.id,
-  //     notifIds,
-  //   });
-  // });
-
-  // const testing = await scheduleNotif(
-  //   userEmail,
-  //   loadedFood[loadedFood.length - 1],
-  // );
-  // console.log('TESTING:', testing);
-
   // update local async storage the new list of pending notifs for user
   await asyncStoreSet(STORE_KEY, JSON.stringify(userNotifData));
-  // await asyncStoreSet(STORE_KEY, JSON.stringify({}));
-  // console.log(
-  //   'userNotifData[userId].notifs length',
-  //   userNotifData[userId].notifs.length,
-  // );
-  // console.log('loadedFood length', loadedFood.length);
-  // console.log(userNotifData[userId].notifs);
+  console.log(
+    'userNotifData[userId].notifs length',
+    userNotifData[userId].notifs.length,
+  );
+  console.log('loadedFood length', loadedFood.length);
+  console.log(userNotifData[userId].notifs);
+  // Notifications.cancelAllScheduledNotificationsAsync();
   console.log('done setting up notifications');
 };
 
