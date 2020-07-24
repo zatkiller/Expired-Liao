@@ -34,7 +34,50 @@ const asyncStoreGet = async (key) => {
 };
 
 const STORE_KEY = 'userNotifData';
-//
+
+// helper function to schedule notif and return notif id
+const scheduleNotif = async (userEmail, food) => {
+  // triggered at the 0000 of the expiry date
+  const momentFoodDate = moment(food.date, 'DD-MM-YYYY');
+
+  let momentWarningDate; // notification date
+  let daysToWarning; // days from now till notification date
+  const notifDates = [];
+  const notifPromises = [];
+  // warn each day for the 3 days leading to expiry (including expiry day)
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i <= 3; ++i) {
+    momentWarningDate = momentFoodDate.subtract(1 * !!i, 'days');
+    daysToWarning = momentWarningDate.diff(
+      moment({ hours: 0, minutes: 0, seconds: 0 }),
+      'days',
+    );
+    if (daysToWarning < 0) break;
+    const warningDate = momentWarningDate.toDate();
+    warningDate.setMinutes(0);
+    warningDate.setSeconds(0);
+    notifDates.push(warningDate);
+    notifPromises.push(
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: `${userEmail}: expiry warning!`,
+          body: `${food.title} is expiring in ${i} days on ${food.date}`,
+        },
+        trigger: warningDate,
+      }),
+    );
+  }
+
+  console.log('------------------------------------------------');
+  console.log('FOOD ID:', food.id);
+  console.log('NOTIF DATES:', notifDates);
+  console.log('DATE NOW:', new Date());
+  console.log('NOTIF PROMISES:', notifPromises);
+
+  return Promise.all(notifPromises);
+};
+
 // helper function for initial set up of push notifications
 const setUpNotifs = async (userId, userEmail, loadedFood) => {
   // set up push notifications only if we're on a physical android/ios
@@ -62,8 +105,15 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
     });
   }
 
+  const notifPromises = loadedFood.map(async (food) =>
+    scheduleNotif(userEmail, food),
+  );
+
   userNotifData[userId] = {
-    notifs: [],
+    notifs: (await Promise.all(notifPromises)).map((notifId, index) => ({
+      notifId,
+      foodId: loadedFood[index].id,
+    })),
   };
 
   // schedule notifications for all user uid's foods and
@@ -93,57 +143,6 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
   // console.log('loadedFood length', loadedFood.length);
   // console.log(userNotifData[userId].notifs);
   console.log('done setting up notifications');
-};
-
-// helper function to schedule notif and return notif id
-const scheduleNotif = async (userEmail, food) => {
-  // triggered at the 0000 of the expiry date
-  const momentFoodDate = moment(food.date, 'DD-MM-YYYY');
-
-  let momentWarningDate; // notification date
-  let daysToWarning; // days from now till notification date
-  const notifDates = [];
-  const notifIds = [];
-  // warn each day for the 3 days leading to expiry (including expiry day)
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i <= 3; ++i) {
-    momentWarningDate = momentFoodDate.subtract(1 * !!i, 'days');
-    daysToWarning = momentWarningDate.diff(
-      moment({ hours: 0, minutes: 0, seconds: 0 }),
-      'days',
-    );
-    if (daysToWarning < 0) break;
-    const warningDate = momentWarningDate.toDate();
-    warningDate.setMinutes(0);
-    warningDate.setSeconds(0);
-    console.log('HERE 1');
-    const notifId = await Notifications.scheduleNotificationAsync({
-      content: {
-        title: `${userEmail}: expiry warning!`,
-        body: `${food.title} is expiring in ${i} days on ${food.date}`,
-      },
-      trigger: { seconds: 5 },
-    });
-    console.log('HERE 2');
-    notifIds.push(notifId);
-    notifDates.push(warningDate);
-  }
-
-  console.log('------------------------------------------------');
-  console.log('FOOD ID:', food.id);
-  console.log('NOTIF DATES:', notifDates);
-  console.log('DATE NOW:', new Date());
-  console.log('NOTIF IDS:', notifIds);
-
-  return notifIds;
-  // console.log('NOTIF PROMISES:', notifPromises);
-
-  // const res = notifPromises;
-
-  // const res = await Promise.all(notifPromises);
-  // console.log('RES:', res);
-  // return res;
 };
 
 const removeNotif = async (userId, userEmail, foodId) => {
