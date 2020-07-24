@@ -13,8 +13,6 @@ export const SET_FOOD = 'SET_FOOD';
 
 const LOCAL_STORE_PREFIX = '@ExpiredLiao:';
 
-const userNotifData = {};
-
 // helper function to set value in asyncstorage
 const asyncStoreSet = async (key, value) => {
   try {
@@ -36,22 +34,7 @@ const asyncStoreGet = async (key) => {
 };
 
 const STORE_KEY = 'userNotifData';
-
-// helper function to schedule notif and return notif id
-const scheduleNotif = async (userEmail, food) => {
-  // const notifId = await Notifications.scheduleNotificationAsync({
-  //   content: {
-  //     title: `${userEmail}: expiry warning!`,
-  //     body: `${food.title} is expiring in 3 days on ${food.date}`,
-  //   },
-  //   trigger: {
-  //     seconds: 100,
-  //   },
-  // });
-
-  return 5;
-};
-
+//
 // helper function for initial set up of push notifications
 const setUpNotifs = async (userId, userEmail, loadedFood) => {
   // set up push notifications only if we're on a physical android/ios
@@ -59,12 +42,23 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
 
   console.log('setUpNotifs', moment().format('DD-MM-YYYY'));
 
+  const testing = await Notifications.scheduleNotificationAsync({
+    content: {
+      title: 'test title',
+      body: 'test body',
+    },
+    trigger: { seconds: 5 },
+  });
+  console.log(testing);
+
   const userNotifData = JSON.parse(await asyncStoreGet(STORE_KEY));
 
   // cancel all pending notifications for user with uid
   if (userNotifData[userId] && userNotifData[userId].notifs) {
-    userNotifData[userId].notifs.forEach(({ notifId }) => {
-      Notifications.cancelScheduledNotificationAsync(notifId);
+    userNotifData[userId].notifs.forEach(({ notifIds }) => {
+      notifIds.forEach((notifId) => {
+        Notifications.cancelScheduledNotificationAsync(notifId);
+      });
     });
   }
 
@@ -74,17 +68,82 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
 
   // schedule notifications for all user uid's foods and
   // store their notifIds in userNotifData[uid].notifs
-  loadedFood.forEach(async (food) => {
-    userNotifData[userId].notifs.push({
-      foodId: food.id,
-      notifId: await scheduleNotif(userEmail, food),
-    });
-  });
+  // await loadedFood.forEach(async (food) => {
+  //   const notifIds = await scheduleNotif(userEmail, food);
+
+  //   userNotifData[userId].notifs.push({
+  //     foodId: food.id,
+  //     notifIds,
+  //   });
+  // });
+
+  // const testing = await scheduleNotif(
+  //   userEmail,
+  //   loadedFood[loadedFood.length - 1],
+  // );
+  // console.log('TESTING:', testing);
 
   // update local async storage the new list of pending notifs for user
   await asyncStoreSet(STORE_KEY, JSON.stringify(userNotifData));
-  console.log(userNotifData);
+  // await asyncStoreSet(STORE_KEY, JSON.stringify({}));
+  // console.log(
+  //   'userNotifData[userId].notifs length',
+  //   userNotifData[userId].notifs.length,
+  // );
+  // console.log('loadedFood length', loadedFood.length);
+  // console.log(userNotifData[userId].notifs);
   console.log('done setting up notifications');
+};
+
+// helper function to schedule notif and return notif id
+const scheduleNotif = async (userEmail, food) => {
+  // triggered at the 0000 of the expiry date
+  const momentFoodDate = moment(food.date, 'DD-MM-YYYY');
+
+  let momentWarningDate; // notification date
+  let daysToWarning; // days from now till notification date
+  const notifDates = [];
+  const notifIds = [];
+  // warn each day for the 3 days leading to expiry (including expiry day)
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i <= 3; ++i) {
+    momentWarningDate = momentFoodDate.subtract(1 * !!i, 'days');
+    daysToWarning = momentWarningDate.diff(
+      moment({ hours: 0, minutes: 0, seconds: 0 }),
+      'days',
+    );
+    if (daysToWarning < 0) break;
+    const warningDate = momentWarningDate.toDate();
+    warningDate.setMinutes(0);
+    warningDate.setSeconds(0);
+    console.log('HERE 1');
+    const notifId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `${userEmail}: expiry warning!`,
+        body: `${food.title} is expiring in ${i} days on ${food.date}`,
+      },
+      trigger: { seconds: 5 },
+    });
+    console.log('HERE 2');
+    notifIds.push(notifId);
+    notifDates.push(warningDate);
+  }
+
+  console.log('------------------------------------------------');
+  console.log('FOOD ID:', food.id);
+  console.log('NOTIF DATES:', notifDates);
+  console.log('DATE NOW:', new Date());
+  console.log('NOTIF IDS:', notifIds);
+
+  return notifIds;
+  // console.log('NOTIF PROMISES:', notifPromises);
+
+  // const res = notifPromises;
+
+  // const res = await Promise.all(notifPromises);
+  // console.log('RES:', res);
+  // return res;
 };
 
 const removeNotif = async (userId, userEmail, foodId) => {
@@ -100,8 +159,10 @@ const removeNotif = async (userId, userEmail, foodId) => {
   console.log(userNotifData);
   userNotifData[userId].notifs.forEach((notif) => {
     if (notif.foodId === foodId) {
-      console.log('cancelled', notif.notifId);
-      Notifications.cancelScheduledNotificationAsync(notif.notifId);
+      // cancel all notifications for given food
+      notif.notifIds.forEach((notifId) => {
+        Notifications.cancelScheduledNotificationAsync(notifId);
+      });
     } else {
       tempNotifs.push(notif);
     }
@@ -125,14 +186,17 @@ const addOrUpdateNotif = async (userId, userEmail, food) => {
   // it shouldn't affect anything else
   userNotifData[userId].notifs.forEach((notif) => {
     if (notif.foodId === foodId) {
-      Notifications.cancelScheduledNotificationAsync(notif.notifId);
+      // cancel all notifications for given food
+      notif.notifIds.forEach((notifId) => {
+        Notifications.cancelScheduledNotificationAsync(notifId);
+      });
     } else {
       tempNotifs.push(notif);
     }
   });
 
   // schedule notif of new food or newly updated food and add to tempNotifs
-  tempNotifs.push({ foodId, notifId: await scheduleNotif(userEmail, food) });
+  tempNotifs.push({ foodId, notifIds: await scheduleNotif(userEmail, food) });
   userNotifData[userId].notifs = tempNotifs;
   asyncStoreSet(STORE_KEY, JSON.stringify(userNotifData));
 };
