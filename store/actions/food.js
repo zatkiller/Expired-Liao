@@ -80,6 +80,9 @@ const scheduleNotif = async (userEmail, food) => {
 
 // helper function for initial set up of push notifications
 const setUpNotifs = async (userId, userEmail, loadedFood) => {
+  Notifications.cancelAllScheduledNotificationsAsync();
+  AsyncStorage.clear();
+  return;
   // set up push notifications only if we're on a physical android/ios
   if (!Constants.isDevice || Constants.platform.web) return;
 
@@ -90,7 +93,7 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
   // cancel all pending notifications for user with uid
   if (userNotifData[userId] && userNotifData[userId].notifs) {
     userNotifData[userId].notifs.forEach(({ notifIds }) => {
-      (notifIds || []).forEach((notifId) => {
+      notifIds.forEach((notifId) => {
         Notifications.cancelScheduledNotificationAsync(notifId);
       });
     });
@@ -103,8 +106,8 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
   // schedule notifications for all user uid's foods and
   // store their notifIds in userNotifData[uid].notifs
   userNotifData[userId] = {
-    notifs: (await Promise.all(notifPromises)).map((notifId, index) => ({
-      notifId,
+    notifs: (await Promise.all(notifPromises)).map((notifIds, index) => ({
+      notifIds,
       foodId: loadedFood[index].id,
     })),
   };
@@ -117,7 +120,6 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
   );
   console.log('loadedFood length', loadedFood.length);
   console.log(userNotifData[userId].notifs);
-  // Notifications.cancelAllScheduledNotificationsAsync();
   console.log('done setting up notifications');
 };
 
