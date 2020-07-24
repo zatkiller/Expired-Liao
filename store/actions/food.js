@@ -38,12 +38,14 @@ const STORE_KEY = 'userNotifData';
 // helper function to schedule notif and return notif id
 const scheduleNotif = async (userEmail, food) => {
   // triggered at the 0000 of the expiry date
+  console.log('------------------------------------------------');
   const momentFoodDate = moment(food.date, 'DD-MM-YYYY');
 
   let momentWarningDate; // notification date
   let daysToWarning; // days from now till notification date
   const notifDates = [];
   const notifPromises = [];
+  // const notifIds = [];
   // warn each day for the 3 days leading to expiry (including expiry day)
 
   // eslint-disable-next-line no-plusplus
@@ -54,27 +56,36 @@ const scheduleNotif = async (userEmail, food) => {
       'days',
     );
     if (daysToWarning < 0) break;
+    else if (daysToWarning > 3) continue;
+
     const warningDate = momentWarningDate.toDate();
     warningDate.setMinutes(0);
     warningDate.setSeconds(0);
     notifDates.push(warningDate);
+    const body =
+      i > 0
+        ? `${food.title} is expiring in ${i} days on ${food.date}`
+        : `${food.title} is expiring today!`;
+    console.log(body);
     notifPromises.push(
       Notifications.scheduleNotificationAsync({
         content: {
           title: `${userEmail}: expiry warning!`,
-          body: `${food.title} is expiring in ${i} days on ${food.date}`,
+          body,
         },
-        trigger: warningDate,
+        trigger: daysToWarning === 0 && i === 0 ? { seconds: 2 } : warningDate,
       }),
     );
   }
 
-  console.log('------------------------------------------------');
   console.log('FOOD ID:', food.id);
   console.log('NOTIF DATES:', notifDates);
   console.log('DATE NOW:', new Date());
   console.log('NOTIF PROMISES:', notifPromises);
+  // console.log('NOTIF Ids:', notifIds);
 
+  console.log('------------------------------------------------');
+  // return notifIds;
   return Promise.all(notifPromises);
 };
 
@@ -87,10 +98,14 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
 
   const userNotifData = JSON.parse(await asyncStoreGet(STORE_KEY));
 
+  // for debug/testing
+  // await Notifications.cancelAllScheduledNotificationsAsync();
+  // await AsyncStorage.clear();
+
   // cancel all pending notifications for user with uid
   if (userNotifData[userId] && userNotifData[userId].notifs) {
     userNotifData[userId].notifs.forEach(({ notifIds }) => {
-      notifIds.forEach((notifId) => {
+      (notifIds || []).forEach((notifId) => {
         Notifications.cancelScheduledNotificationAsync(notifId);
       });
     });
@@ -118,6 +133,7 @@ const setUpNotifs = async (userId, userEmail, loadedFood) => {
   console.log('loadedFood length', loadedFood.length);
   console.log(userNotifData[userId].notifs);
   console.log('done setting up notifications');
+  console.log(await Notifications.getAllScheduledNotificationsAsync());
 };
 
 const removeNotif = async (userId, userEmail, foodId) => {
