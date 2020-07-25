@@ -70,7 +70,8 @@ const scheduleNotif = async (userEmail, food) => {
           title: `${userEmail}: expiry warning!`,
           body,
         },
-        trigger: daysToWarning === 0 ? { seconds: 2 } : warningDate,
+        // trigger immediately if expiring today!
+        trigger: daysToWarning === 0 && i === 0 ? { seconds: 2 } : warningDate,
       }),
     );
   }
