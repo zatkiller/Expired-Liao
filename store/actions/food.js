@@ -37,7 +37,6 @@ const STORE_KEY = 'userNotifData';
 
 // helper function to schedule notif and return notif id
 const scheduleNotif = async (userEmail, food) => {
-  // triggered at the 0000 of the expiry date
   console.log('------------------------------------------------');
   const momentFoodDate = moment(food.date, 'DD-MM-YYYY');
 
@@ -46,34 +45,32 @@ const scheduleNotif = async (userEmail, food) => {
   const notifDates = [];
   const notifPromises = [];
   // const notifIds = [];
-  // warn each day for the 3 days leading to expiry (including expiry day)
 
+  // warn each day for the 3 days leading to expiry (including expiry day)
+  // notifs on day, day - 1,day - 2, day - 3
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i <= 3; ++i) {
     momentWarningDate = momentFoodDate.subtract(1 * !!i, 'days');
-    daysToWarning = momentWarningDate.diff(
-      moment({ hours: 0, minutes: 0, seconds: 0 }),
-      'days',
-    );
-    if (daysToWarning < 0) break;
-    else if (daysToWarning > 3) continue;
+    daysToWarning = momentWarningDate.diff(moment(), 'days');
+
+    if (daysToWarning < 0) break; // last valid notif day
 
     const warningDate = momentWarningDate.toDate();
-    warningDate.setMinutes(0);
-    warningDate.setSeconds(0);
+    // warningDate.setMinutes(0);
+    // warningDate.setSeconds(0);
     notifDates.push(warningDate);
     const body =
       i > 0
         ? `${food.title} is expiring in ${i} days on ${food.date}`
         : `${food.title} is expiring today!`;
-    console.log(body);
+
     notifPromises.push(
       Notifications.scheduleNotificationAsync({
         content: {
           title: `${userEmail}: expiry warning!`,
           body,
         },
-        trigger: daysToWarning === 0 && i === 0 ? { seconds: 2 } : warningDate,
+        trigger: daysToWarning === 0 ? { seconds: 2 } : warningDate,
       }),
     );
   }
