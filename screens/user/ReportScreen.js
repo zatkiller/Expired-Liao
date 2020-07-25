@@ -60,7 +60,7 @@ const ReportScreen = ({ navigation }) => {
 	);
 
 	const fractionExpired = numberExpired / foodList.length;
-	const percentageExpired = 100 * fractionExpired;
+	const percentageExpired = foodList.length ? 100 * fractionExpired : 0;
 
 	const circumference = 2 * Math.PI * CIRCLE_RADIUS;
 	const circumferenceOffset = (1 - fractionExpired) * circumference;

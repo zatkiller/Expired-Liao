@@ -49,10 +49,10 @@ const AuthScreen = (props) => {
 
 	const [formState, dispatchFormState] = useReducer(formReducer, {
 		inputValues: {
-			email: "user@gmail.com",
-			password: "password",
-			// email: '',
-			// password: '',
+			// email: "user@gmail.com",
+			// password: "password",
+			email: "",
+			password: "",
 		},
 		inputValidities: {
 			email: false,
@@ -79,10 +79,10 @@ const AuthScreen = (props) => {
 				);
 			} else {
 				action = authActions.login(
-					// formState.inputValues.email,
-					// formState.inputValues.password,
-					"user@gmail.com",
-					"password"
+					formState.inputValues.email,
+					formState.inputValues.password
+					// "user@gmail.com",
+					// "password"
 				);
 			}
 			dispatch(action);
