@@ -39,30 +39,35 @@ const STORE_KEY = 'userNotifData';
 const scheduleNotif = async (userEmail, food) => {
   console.log('------------------------------------------------');
   const momentFoodDate = moment(food.date, 'DD-MM-YYYY');
+  console.log('FOOD TITLE:', food.title);
+  console.log('EXPIRY DATE:', momentFoodDate);
 
   let momentWarningDate; // notification date
   let daysToWarning; // days from now till notification date
   const notifDates = [];
   const notifPromises = [];
-  // const notifIds = [];
 
   // warn each day for the 3 days leading to expiry (including expiry day)
   // notifs on day, day - 1,day - 2, day - 3
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i <= 3; ++i) {
     momentWarningDate = momentFoodDate.subtract(1 * !!i, 'days');
-    daysToWarning = momentWarningDate.diff(moment(), 'days');
+    daysToWarning = momentWarningDate.diff(
+      moment({ hours: 0, minutes: 0, seconds: 0 }),
+      'days',
+    );
 
     if (daysToWarning < 0) break; // last valid notif day
 
     const warningDate = momentWarningDate.toDate();
-    // warningDate.setMinutes(0);
-    // warningDate.setSeconds(0);
     notifDates.push(warningDate);
+    const showImmediately = daysToWarning === 0 && i === 0;
     const body =
-      i > 0
-        ? `${food.title} is expiring in ${i} days on ${food.date}`
-        : `${food.title} is expiring today!`;
+      i === 0
+        ? `${food.title} is expiring today!`
+        : `${food.title} is expiring in ${i} days on ${food.date}`;
+
+    console.log(body);
 
     notifPromises.push(
       Notifications.scheduleNotificationAsync({
@@ -71,7 +76,7 @@ const scheduleNotif = async (userEmail, food) => {
           body,
         },
         // trigger immediately if expiring today!
-        trigger: daysToWarning === 0 && i === 0 ? { seconds: 2 } : warningDate,
+        trigger: showImmediately ? { seconds: 2 } : warningDate,
       }),
     );
   }
@@ -80,10 +85,8 @@ const scheduleNotif = async (userEmail, food) => {
   console.log('NOTIF DATES:', notifDates);
   console.log('DATE NOW:', new Date());
   console.log('NOTIF PROMISES:', notifPromises);
-  // console.log('NOTIF Ids:', notifIds);
 
   console.log('------------------------------------------------');
-  // return notifIds;
   return Promise.all(notifPromises);
 };
 
