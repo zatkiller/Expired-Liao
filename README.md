@@ -1,5 +1,8 @@
 Expired Liao App
 
-Basic Add function is working
-Delete Food item by clicking on the food item
-Scroll through Food items when list is too long working.
+Cross platform Mobile App developed using React Native and Firebase.
+
+Functions include:
+1. Adding, updating and deleting food items
+2. Expiry Date push notifcation reminders
+3. Monthly Report Track
