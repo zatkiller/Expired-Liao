@@ -18,7 +18,7 @@ Home Page:
 
 Montly Report Feature:
 <br/>
-![alt text](https://github.com/zatkiller/Expired-Liao/blob/master/assets/images/Montly Report Tracker.png?raw=true)
+![alt text](https://github.com/zatkiller/Expired-Liao/blob/master/assets/images/"Montly Report Tracker.png"?raw=true)
 
 Notifications Feature:
 <br/>
