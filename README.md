@@ -1,5 +1,5 @@
 ### Expired Liao App
-Cross-platform Mobile App built using React Native and Firebase.
+Cross-platform Mobile App built using React Native and Firebase for Orbital 2020
 
 ### Features
 1. Adding, updating and deleting food items
