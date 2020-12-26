@@ -11,6 +11,7 @@ Cross-platform Mobile App built using React Native and Firebase.
 Login Page:
 
 Home Page:
+![alt text](https://github.com/zatkiller/Expired-Liao/blob/master/assets/images/Homepage.png?raw=true)
 
 Montly Report Feature:
 
